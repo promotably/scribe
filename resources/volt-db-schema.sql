@@ -71,16 +71,29 @@ PARTITION TABLE orders ON COLUMN visitor_id;
 
 CREATE TABLE order_products
 (
- message_id             varchar(36)     NOT NULL,
- site_id                varchar(36)     NOT NULL,
- visitor_id             varchar(36)     NOT NULL,
- product_id             varchar(255)    NOT NULL,
- quantity               integer         NOT NULL,
- total_line_amount      decimal         NOT NULL,
- CONSTRAINT PK_order_products PRIMARY KEY
- (
-   site_id, visitor_id, message_id, product_id
- )
+  message_id             varchar(36)     NOT NULL,
+  site_id                varchar(36)     NOT NULL,
+  visitor_id             varchar(36)     NOT NULL,
+  product_id             varchar(255)    NOT NULL,
+  quantity               integer         NOT NULL,
+  total_line_amount      decimal         NOT NULL,
+  CONSTRAINT PK_order_products PRIMARY KEY
+  (
+    site_id, visitor_id, message_id, product_id
+  )
 );
 
 PARTITION TABLE order_products ON COLUMN visitor_id;
+
+CREATE TABLE promo_uses
+(
+  message_id            varchar(36)     NOT NULL,
+  site_id               varchar(36)     NOT NULL,
+  visitor_id            varchar(36)     NOT NULL,
+  promo_id              varchar(36)     NOT NULL,
+  discount_amount       decimal         NOT NULL,
+  currency              varchar(3)      DEFAULT 'USD',
+  created_at            timestamp       DEFAULT CURRENT_TIMESTAMP
+);
+
+PARTITION TABLE promo_uses ON COLUMN visitor_id;
