@@ -1,4 +1,4 @@
-SQL: UPSERT INTO ORDERS VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+SQL: UPSERT INTO ORDERS VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 PLAN:
 UPSERT into "ORDERS"
  MATERIALIZE TUPLE from parameters and/or literals

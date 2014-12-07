@@ -13,17 +13,19 @@
    volume between sites.
 */
 
-/* site_visits contains 1 row for every site visit event */
+/* site_visits contains 1 row for every site visit event, once per
+   session */
 
 CREATE TABLE site_visits
 (
   message_id     varchar(36)    NOT NULL,
   site_id        varchar(36)    NOT NULL,
-  shopper_id     varchar(36)    NOT NULL, 
+  shopper_id     varchar(36)    NOT NULL,
+  session_id     varchar(36)    NOT NULL,
   created_at     timestamp      DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT PK_site_visits PRIMARY KEY
   (
-    site_id, shopper_id, message_id
+    site_id, shopper_id, session_id, message_id
   )
 );
 
@@ -38,12 +40,13 @@ CREATE TABLE product_views
   message_id     varchar(36)    NOT NULL,
   site_id        varchar(36)    NOT NULL,
   shopper_id     varchar(36)    NOT NULL,
+  session_id     varchar(36)    NOT NULL,
   product_id     varchar(255)   NOT NULL,
   category_id    varchar(255)   DEFAULT NULL,
   created_at     timestamp      DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT PK_product_views PRIMARY KEY
   (
-    site_id, shopper_id, message_id
+    site_id, shopper_id, session_id, message_id
   )
 );
 
@@ -85,13 +88,14 @@ CREATE TABLE orders
   order_number          varchar(255)    DEFAULT NULL,
   site_id               varchar(36)     NOT NULL,
   shopper_id            varchar(36)     NOT NULL,
+  session_id            varchar(36)     NOT NULL,
   currency              varchar(3)      DEFAULT 'USD',
   total_amount_pre_tax  decimal         NOT NULL,
   total_amount_with_tax decimal         NOT NULL,
   created_at            timestamp       DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT PK_orders PRIMARY KEY
   (
-    site_id, shopper_id, message_id
+    site_id, shopper_id, session_id, message_id
   ) 
 );
 
@@ -109,12 +113,13 @@ CREATE TABLE order_products
   message_id             varchar(36)     NOT NULL,
   site_id                varchar(36)     NOT NULL,
   shopper_id             varchar(36)     NOT NULL,
+  session_id             varchar(36)     NOT NULL,
   product_id             varchar(255)    NOT NULL,
   quantity               integer         NOT NULL,
   total_line_amount      decimal         NOT NULL,
   CONSTRAINT PK_order_products PRIMARY KEY
   (
-    site_id, shopper_id, message_id, product_id
+    site_id, shopper_id, session_id, message_id, product_id
   )
 );
 
@@ -131,13 +136,14 @@ CREATE TABLE promo_uses
   message_id            varchar(36)     NOT NULL,
   site_id               varchar(36)     NOT NULL,
   shopper_id            varchar(36)     NOT NULL,
+  session_id            varchar(36)     NOT NULL,
   promo_id              varchar(36)     NOT NULL,
   discount_amount       decimal         NOT NULL,
   currency              varchar(3)      DEFAULT 'USD',
   created_at            timestamp       DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT PK_promo_uses PRIMARY KEY
   (
-    site_id, shopper_id, message_id, promo_id
+    site_id, shopper_id, session_id, message_id, promo_id
   )
 );
 

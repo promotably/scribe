@@ -1,4 +1,4 @@
-SQL: INSERT INTO SITE_VISITS VALUES (?, ?, ?, ?);
+SQL: INSERT INTO SITE_VISITS VALUES (?, ?, ?, ?, ?);
 PLAN:
 INSERT into "SITE_VISITS"
  MATERIALIZE TUPLE from parameters and/or literals

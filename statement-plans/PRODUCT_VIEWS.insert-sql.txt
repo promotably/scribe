@@ -1,4 +1,4 @@
-SQL: INSERT INTO PRODUCT_VIEWS VALUES (?, ?, ?, ?, ?, ?);
+SQL: INSERT INTO PRODUCT_VIEWS VALUES (?, ?, ?, ?, ?, ?, ?);
 PLAN:
 INSERT into "PRODUCT_VIEWS"
  MATERIALIZE TUPLE from parameters and/or literals

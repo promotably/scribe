@@ -1,4 +1,4 @@
-SQL: INSERT INTO PROMO_USES VALUES (?, ?, ?, ?, ?, ?, ?);
+SQL: INSERT INTO PROMO_USES VALUES (?, ?, ?, ?, ?, ?, ?, ?);
 PLAN:
 INSERT into "PROMO_USES"
  MATERIALIZE TUPLE from parameters and/or literals

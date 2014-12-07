@@ -1,4 +1,4 @@
-SQL: UPSERT INTO SITE_VISITS VALUES (?, ?, ?, ?);
+SQL: UPSERT INTO SITE_VISITS VALUES (?, ?, ?, ?, ?);
 PLAN:
 UPSERT into "SITE_VISITS"
  MATERIALIZE TUPLE from parameters and/or literals

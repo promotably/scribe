@@ -72,7 +72,7 @@
                     </div>
                     <div class="dataBlockContent" style="padding:0;"> <table class='table table-condensed'>
 <tr><td>Compiled by VoltDB Version</td><td>4.9</td></tr>
-<tr><td>Compiled on</td><td>Sun, 7 Dec 2014 19:27:29 GMT+00:00</td></tr>
+<tr><td>Compiled on</td><td>Sun, 7 Dec 2014 19:34:32 GMT+00:00</td></tr>
 <tr><td>Table Count</td><td>6 (6 partitioned / 0 replicated)</td></tr>
 <tr><td>Materialized View Count</td><td>0</td></tr>
 <tr><td>Index Count</td><td>15</td></tr>
@@ -104,7 +104,7 @@
                             </thead>
                             <tbody>
 
-                                <tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-orders--icon' class='icon-chevron-right'></i> <a href='#' id='s-orders' class='togglex'>ORDERS</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>8</td><td>3 (3 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
+                                <tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-orders--icon' class='icon-chevron-right'></i> <a href='#' id='s-orders' class='togglex'>ORDERS</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>9</td><td>3 (3 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='7' id='s-orders--dropdown'>
 <p>MISSING DDL</p>
     <table class='table tableL2 table-condensed'>
@@ -115,18 +115,18 @@
         <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-orders-orderssiteidshopperidx--icon' class='icon-chevron-right'></i> <a href='#' id='s-orders-orderssiteidshopperidx' class='togglex'>ORDERSSITEIDSHOPPERIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-orders-orderssiteidshopperidx--dropdown'>
 </td></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-orders-voltdb_autogen_constraint_idx_pk_orders--icon' class='icon-chevron-right'></i> <a href='#' id='s-orders-voltdb_autogen_constraint_idx_pk_orders' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_ORDERS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-orders-voltdb_autogen_constraint_idx_pk_orders--icon' class='icon-chevron-right'></i> <a href='#' id='s-orders-voltdb_autogen_constraint_idx_pk_orders' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_ORDERS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-orders-voltdb_autogen_constraint_idx_pk_orders--dropdown'>
 </td></tr>
     </thead>
     </table>
 </td></tr>
-<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-order_products--icon' class='icon-chevron-right'></i> <a href='#' id='s-order_products' class='togglex'>ORDER_PRODUCTS</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>6</td><td>1 (1 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
+<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-order_products--icon' class='icon-chevron-right'></i> <a href='#' id='s-order_products' class='togglex'>ORDER_PRODUCTS</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>7</td><td>1 (1 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='7' id='s-order_products--dropdown'>
 <p>MISSING DDL</p>
     <table class='table tableL2 table-condensed'>
     <thead><tr><th>Index Name</th><th>Type</th><th>Columns</th><th>Attributes</th></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products--icon' class='icon-chevron-right'></i> <a href='#' id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_ORDER_PRODUCTS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID, PRODUCT_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products--icon' class='icon-chevron-right'></i> <a href='#' id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_ORDER_PRODUCTS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID, PRODUCT_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products--dropdown'>
 </td></tr>
     </thead>
@@ -149,7 +149,7 @@
     </thead>
     </table>
 </td></tr>
-<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-product_views--icon' class='icon-chevron-right'></i> <a href='#' id='s-product_views' class='togglex'>PRODUCT_VIEWS</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>6</td><td>3 (3 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
+<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-product_views--icon' class='icon-chevron-right'></i> <a href='#' id='s-product_views' class='togglex'>PRODUCT_VIEWS</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>7</td><td>3 (3 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='7' id='s-product_views--dropdown'>
 <p>MISSING DDL</p>
     <table class='table tableL2 table-condensed'>
@@ -160,13 +160,13 @@
         <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-product_views-productviewssiteidshopperididx--icon' class='icon-chevron-right'></i> <a href='#' id='s-product_views-productviewssiteidshopperididx' class='togglex'>PRODUCTVIEWSSITEIDSHOPPERIDIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-product_views-productviewssiteidshopperididx--dropdown'>
 </td></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views--icon' class='icon-chevron-right'></i> <a href='#' id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PRODUCT_VIEWS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views--icon' class='icon-chevron-right'></i> <a href='#' id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PRODUCT_VIEWS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views--dropdown'>
 </td></tr>
     </thead>
     </table>
 </td></tr>
-<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses' class='togglex'>PROMO_USES</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>7</td><td>2 (2 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
+<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses' class='togglex'>PROMO_USES</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>8</td><td>2 (2 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='7' id='s-promo_uses--dropdown'>
 <p>MISSING DDL</p>
     <table class='table tableL2 table-condensed'>
@@ -174,13 +174,13 @@
         <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-promousessiteidshopperidpromoididx--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-promousessiteidshopperidpromoididx' class='togglex'>PROMOUSESSITEIDSHOPPERIDPROMOIDIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, PROMO_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-promo_uses-promousessiteidshopperidpromoididx--dropdown'>
 </td></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PROMO_USES</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID, PROMO_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PROMO_USES</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID, PROMO_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--dropdown'>
 </td></tr>
     </thead>
     </table>
 </td></tr>
-<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-site_visits--icon' class='icon-chevron-right'></i> <a href='#' id='s-site_visits' class='togglex'>SITE_VISITS</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>4</td><td>3 (3 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
+<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-site_visits--icon' class='icon-chevron-right'></i> <a href='#' id='s-site_visits' class='togglex'>SITE_VISITS</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on SHOPPER_ID</small></td><td>5</td><td>3 (3 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='7' id='s-site_visits--dropdown'>
 <p>MISSING DDL</p>
     <table class='table tableL2 table-condensed'>
@@ -191,7 +191,7 @@
         <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-site_visits-sitevisitssiteidshopperididx--icon' class='icon-chevron-right'></i> <a href='#' id='s-site_visits-sitevisitssiteidshopperididx' class='togglex'>SITEVISITSSITEIDSHOPPERIDIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-site_visits-sitevisitssiteidshopperididx--dropdown'>
 </td></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits--icon' class='icon-chevron-right'></i> <a href='#' id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_SITE_VISITS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits--icon' class='icon-chevron-right'></i> <a href='#' id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_SITE_VISITS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits--dropdown'>
 </td></tr>
     </thead>
@@ -219,11 +219,12 @@ CREATE TABLE ORDERS (
    ORDER_NUMBER varchar(255),
    SITE_ID varchar(36) NOT NULL,
    SHOPPER_ID varchar(36) NOT NULL,
+   SESSION_ID varchar(36) NOT NULL,
    CURRENCY varchar(3) DEFAULT 'USD',
    TOTAL_AMOUNT_PRE_TAX decimal NOT NULL,
    TOTAL_AMOUNT_WITH_TAX decimal NOT NULL,
    CREATED_AT timestamp DEFAULT CURRENT_TIMESTAMP,
-   CONSTRAINT PK_ORDERS PRIMARY KEY (SITE_ID, SHOPPER_ID, MESSAGE_ID)
+   CONSTRAINT PK_ORDERS PRIMARY KEY (SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID)
 );
 PARTITION TABLE ORDERS ON COLUMN SHOPPER_ID;
 CREATE ASSUMEUNIQUE INDEX ORDERSMESSAGEIDIDX ON ORDERS (MESSAGE_ID);
@@ -233,10 +234,11 @@ CREATE TABLE ORDER_PRODUCTS (
    MESSAGE_ID varchar(36) NOT NULL,
    SITE_ID varchar(36) NOT NULL,
    SHOPPER_ID varchar(36) NOT NULL,
+   SESSION_ID varchar(36) NOT NULL,
    PRODUCT_ID varchar(255) NOT NULL,
    QUANTITY integer NOT NULL,
    TOTAL_LINE_AMOUNT decimal NOT NULL,
-   CONSTRAINT PK_ORDER_PRODUCTS PRIMARY KEY (SITE_ID, SHOPPER_ID, MESSAGE_ID, PRODUCT_ID)
+   CONSTRAINT PK_ORDER_PRODUCTS PRIMARY KEY (SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID, PRODUCT_ID)
 );
 PARTITION TABLE ORDER_PRODUCTS ON COLUMN SHOPPER_ID;
 
@@ -259,10 +261,11 @@ CREATE TABLE PRODUCT_VIEWS (
    MESSAGE_ID varchar(36) NOT NULL,
    SITE_ID varchar(36) NOT NULL,
    SHOPPER_ID varchar(36) NOT NULL,
+   SESSION_ID varchar(36) NOT NULL,
    PRODUCT_ID varchar(255) NOT NULL,
    CATEGORY_ID varchar(255),
    CREATED_AT timestamp DEFAULT CURRENT_TIMESTAMP,
-   CONSTRAINT PK_PRODUCT_VIEWS PRIMARY KEY (SITE_ID, SHOPPER_ID, MESSAGE_ID)
+   CONSTRAINT PK_PRODUCT_VIEWS PRIMARY KEY (SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID)
 );
 PARTITION TABLE PRODUCT_VIEWS ON COLUMN SHOPPER_ID;
 CREATE ASSUMEUNIQUE INDEX PRODUCTVIEWSMESSAGEIDIDX ON PRODUCT_VIEWS (MESSAGE_ID);
@@ -272,11 +275,12 @@ CREATE TABLE PROMO_USES (
    MESSAGE_ID varchar(36) NOT NULL,
    SITE_ID varchar(36) NOT NULL,
    SHOPPER_ID varchar(36) NOT NULL,
+   SESSION_ID varchar(36) NOT NULL,
    PROMO_ID varchar(36) NOT NULL,
    DISCOUNT_AMOUNT decimal NOT NULL,
    CURRENCY varchar(3) DEFAULT 'USD',
    CREATED_AT timestamp DEFAULT CURRENT_TIMESTAMP,
-   CONSTRAINT PK_PROMO_USES PRIMARY KEY (SITE_ID, SHOPPER_ID, MESSAGE_ID, PROMO_ID)
+   CONSTRAINT PK_PROMO_USES PRIMARY KEY (SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID, PROMO_ID)
 );
 PARTITION TABLE PROMO_USES ON COLUMN SHOPPER_ID;
 CREATE INDEX PROMOUSESSITEIDSHOPPERIDPROMOIDIDX ON PROMO_USES (SITE_ID, SHOPPER_ID, PROMO_ID);
@@ -285,8 +289,9 @@ CREATE TABLE SITE_VISITS (
    MESSAGE_ID varchar(36) NOT NULL,
    SITE_ID varchar(36) NOT NULL,
    SHOPPER_ID varchar(36) NOT NULL,
+   SESSION_ID varchar(36) NOT NULL,
    CREATED_AT timestamp DEFAULT CURRENT_TIMESTAMP,
-   CONSTRAINT PK_SITE_VISITS PRIMARY KEY (SITE_ID, SHOPPER_ID, MESSAGE_ID)
+   CONSTRAINT PK_SITE_VISITS PRIMARY KEY (SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID)
 );
 PARTITION TABLE SITE_VISITS ON COLUMN SHOPPER_ID;
 CREATE ASSUMEUNIQUE INDEX SITEVISITSMESSAGEIDIDX ON SITE_VISITS (MESSAGE_ID);
@@ -402,12 +407,12 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
 <td><span class='label label l-Table'>Table</span></td>
 <td><div class='ecount'><input type='text' class='form-control count-input' id='s-size-1-count' onblur='sizes_update_all();' value='1000' class='form-control' placeholder='.ecount'></input>
 </div></td>
-<td id='s-size-1-rmin' class='right-cell'>437</td>
-<td id='s-size-1-rmax' class='right-cell'>2293</td>
-<td id='s-size-1-imin' class='right-cell'>168</td>
-<td id='s-size-1-imax' class='right-cell'>168</td>
-<td id='s-size-1-tmin' class='right-cell calculated-cell'>605000</td>
-<td id='s-size-1-tmax' class='right-cell calculated-cell'>2461000</td>
+<td id='s-size-1-rmin' class='right-cell'>533</td>
+<td id='s-size-1-rmax' class='right-cell'>2517</td>
+<td id='s-size-1-imin' class='right-cell'>176</td>
+<td id='s-size-1-imax' class='right-cell'>176</td>
+<td id='s-size-1-tmin' class='right-cell calculated-cell'>709000</td>
+<td id='s-size-1-tmax' class='right-cell calculated-cell'>2693000</td>
 </tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='6' id='s-size-1--dropdown'>
 <p>MISSING DDL</p>
@@ -419,7 +424,7 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
         <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-orders-orderssiteidshopperidx--icon' class='icon-chevron-right'></i> <a href='#' id='s-orders-orderssiteidshopperidx' class='togglex'>ORDERSSITEIDSHOPPERIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-orders-orderssiteidshopperidx--dropdown'>
 </td></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-orders-voltdb_autogen_constraint_idx_pk_orders--icon' class='icon-chevron-right'></i> <a href='#' id='s-orders-voltdb_autogen_constraint_idx_pk_orders' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_ORDERS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-orders-voltdb_autogen_constraint_idx_pk_orders--icon' class='icon-chevron-right'></i> <a href='#' id='s-orders-voltdb_autogen_constraint_idx_pk_orders' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_ORDERS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-orders-voltdb_autogen_constraint_idx_pk_orders--dropdown'>
 </td></tr>
     </thead>
@@ -429,18 +434,18 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
 <td><span class='label label l-Table'>Table</span></td>
 <td><div class='ecount'><input type='text' class='form-control count-input' id='s-size-2-count' onblur='sizes_update_all();' value='1000' class='form-control' placeholder='.ecount'></input>
 </div></td>
-<td id='s-size-2-rmin' class='right-cell'>404</td>
-<td id='s-size-2-rmax' class='right-cell'>2260</td>
-<td id='s-size-2-imin' class='right-cell'>72</td>
-<td id='s-size-2-imax' class='right-cell'>72</td>
-<td id='s-size-2-tmin' class='right-cell calculated-cell'>476000</td>
-<td id='s-size-2-tmax' class='right-cell calculated-cell'>2332000</td>
+<td id='s-size-2-rmin' class='right-cell'>500</td>
+<td id='s-size-2-rmax' class='right-cell'>2484</td>
+<td id='s-size-2-imin' class='right-cell'>80</td>
+<td id='s-size-2-imax' class='right-cell'>80</td>
+<td id='s-size-2-tmin' class='right-cell calculated-cell'>580000</td>
+<td id='s-size-2-tmax' class='right-cell calculated-cell'>2564000</td>
 </tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='6' id='s-size-2--dropdown'>
 <p>MISSING DDL</p>
     <table class='table tableL2 table-condensed'>
     <thead><tr><th>Index Name</th><th>Type</th><th>Columns</th><th>Attributes</th></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products--icon' class='icon-chevron-right'></i> <a href='#' id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_ORDER_PRODUCTS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID, PRODUCT_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products--icon' class='icon-chevron-right'></i> <a href='#' id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_ORDER_PRODUCTS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID, PRODUCT_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-order_products-voltdb_autogen_constraint_idx_pk_order_products--dropdown'>
 </td></tr>
     </thead>
@@ -477,12 +482,12 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
 <td><span class='label label l-Table'>Table</span></td>
 <td><div class='ecount'><input type='text' class='form-control count-input' id='s-size-4-count' onblur='sizes_update_all();' value='1000' class='form-control' placeholder='.ecount'></input>
 </div></td>
-<td id='s-size-4-rmin' class='right-cell'>488</td>
-<td id='s-size-4-rmax' class='right-cell'>3816</td>
-<td id='s-size-4-imin' class='right-cell'>168</td>
-<td id='s-size-4-imax' class='right-cell'>168</td>
-<td id='s-size-4-tmin' class='right-cell calculated-cell'>656000</td>
-<td id='s-size-4-tmax' class='right-cell calculated-cell'>3984000</td>
+<td id='s-size-4-rmin' class='right-cell'>584</td>
+<td id='s-size-4-rmax' class='right-cell'>4040</td>
+<td id='s-size-4-imin' class='right-cell'>176</td>
+<td id='s-size-4-imax' class='right-cell'>176</td>
+<td id='s-size-4-tmin' class='right-cell calculated-cell'>760000</td>
+<td id='s-size-4-tmax' class='right-cell calculated-cell'>4216000</td>
 </tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='6' id='s-size-4--dropdown'>
 <p>MISSING DDL</p>
@@ -494,7 +499,7 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
         <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-product_views-productviewssiteidshopperididx--icon' class='icon-chevron-right'></i> <a href='#' id='s-product_views-productviewssiteidshopperididx' class='togglex'>PRODUCTVIEWSSITEIDSHOPPERIDIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-product_views-productviewssiteidshopperididx--dropdown'>
 </td></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views--icon' class='icon-chevron-right'></i> <a href='#' id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PRODUCT_VIEWS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views--icon' class='icon-chevron-right'></i> <a href='#' id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PRODUCT_VIEWS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-product_views-voltdb_autogen_constraint_idx_pk_product_views--dropdown'>
 </td></tr>
     </thead>
@@ -504,12 +509,12 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
 <td><span class='label label l-Table'>Table</span></td>
 <td><div class='ecount'><input type='text' class='form-control count-input' id='s-size-5-count' onblur='sizes_update_all();' value='1000' class='form-control' placeholder='.ecount'></input>
 </div></td>
-<td id='s-size-5-rmin' class='right-cell'>421</td>
-<td id='s-size-5-rmax' class='right-cell'>933</td>
-<td id='s-size-5-imin' class='right-cell'>136</td>
-<td id='s-size-5-imax' class='right-cell'>136</td>
-<td id='s-size-5-tmin' class='right-cell calculated-cell'>557000</td>
-<td id='s-size-5-tmax' class='right-cell calculated-cell'>1069000</td>
+<td id='s-size-5-rmin' class='right-cell'>517</td>
+<td id='s-size-5-rmax' class='right-cell'>1157</td>
+<td id='s-size-5-imin' class='right-cell'>144</td>
+<td id='s-size-5-imax' class='right-cell'>144</td>
+<td id='s-size-5-tmin' class='right-cell calculated-cell'>661000</td>
+<td id='s-size-5-tmax' class='right-cell calculated-cell'>1301000</td>
 </tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='6' id='s-size-5--dropdown'>
 <p>MISSING DDL</p>
@@ -518,7 +523,7 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
         <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-promousessiteidshopperidpromoididx--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-promousessiteidshopperidpromoididx' class='togglex'>PROMOUSESSITEIDSHOPPERIDPROMOIDIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, PROMO_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-promo_uses-promousessiteidshopperidpromoididx--dropdown'>
 </td></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PROMO_USES</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID, PROMO_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PROMO_USES</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID, PROMO_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--dropdown'>
 </td></tr>
     </thead>
@@ -528,12 +533,12 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
 <td><span class='label label l-Table'>Table</span></td>
 <td><div class='ecount'><input type='text' class='form-control count-input' id='s-size-6-count' onblur='sizes_update_all();' value='1000' class='form-control' placeholder='.ecount'></input>
 </div></td>
-<td id='s-size-6-rmin' class='right-cell'>296</td>
-<td id='s-size-6-rmax' class='right-cell'>680</td>
-<td id='s-size-6-imin' class='right-cell'>168</td>
-<td id='s-size-6-imax' class='right-cell'>168</td>
-<td id='s-size-6-tmin' class='right-cell calculated-cell'>464000</td>
-<td id='s-size-6-tmax' class='right-cell calculated-cell'>848000</td>
+<td id='s-size-6-rmin' class='right-cell'>392</td>
+<td id='s-size-6-rmax' class='right-cell'>904</td>
+<td id='s-size-6-imin' class='right-cell'>176</td>
+<td id='s-size-6-imax' class='right-cell'>176</td>
+<td id='s-size-6-tmin' class='right-cell calculated-cell'>568000</td>
+<td id='s-size-6-tmax' class='right-cell calculated-cell'>1080000</td>
 </tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='6' id='s-size-6--dropdown'>
 <p>MISSING DDL</p>
@@ -545,7 +550,7 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
         <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-site_visits-sitevisitssiteidshopperididx--icon' class='icon-chevron-right'></i> <a href='#' id='s-site_visits-sitevisitssiteidshopperididx' class='togglex'>SITEVISITSSITEIDSHOPPERIDIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-site_visits-sitevisitssiteidshopperididx--dropdown'>
 </td></tr>
-        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits--icon' class='icon-chevron-right'></i> <a href='#' id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_SITE_VISITS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits--icon' class='icon-chevron-right'></i> <a href='#' id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_SITE_VISITS</a></td><td>BALANCED_TREE</td><td>SITE_ID, SHOPPER_ID, SESSION_ID, MESSAGE_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
 <tr class='dropdown2'><td colspan='5' id='s-site_visits-voltdb_autogen_constraint_idx_pk_site_visits--dropdown'>
 </td></tr>
     </thead>
@@ -565,11 +570,11 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
                     <div class="dataBlockContent">
                         <div class="tblScroll">
                         <table class='table size-summary-table'>
-<tr><td id='s-size-summary-table-count' class='right-cell'>6</td><td>tables whose row data  is expected to use between&nbsp;</td><td id='s-size-summary-table-min' class='right-cell calculated-cell'>2634000</td><td>&nbsp;and&nbsp;</td><td id='s-size-summary-table-max' class='right-cell calculated-cell'>14026000</td><td>&nbsp; of memory.&nbsp;</td></tr>
+<tr><td id='s-size-summary-table-count' class='right-cell'>6</td><td>tables whose row data  is expected to use between&nbsp;</td><td id='s-size-summary-table-min' class='right-cell calculated-cell'>3114000</td><td>&nbsp;and&nbsp;</td><td id='s-size-summary-table-max' class='right-cell calculated-cell'>15146000</td><td>&nbsp; of memory.&nbsp;</td></tr>
 <tr><td id='s-size-summary-view-count' class='right-cell'>0</td><td>materialized views whose row data  is expected to use about&nbsp;</td><td id='s-size-summary-view-min' class='right-cell calculated-cell'>0</td><td colspan='3'>&nbsp; of memory.&nbsp;</td></tr>
-<tr><td id='s-size-summary-index-count' class='right-cell'>15</td><td>indexes whose key data and overhead  is expected to use about&nbsp;</td><td id='s-size-summary-index-min' class='right-cell calculated-cell'>880</td><td colspan='3'>&nbsp; of memory.&nbsp;</td></tr>
+<tr><td id='s-size-summary-index-count' class='right-cell'>15</td><td>indexes whose key data and overhead  is expected to use about&nbsp;</td><td id='s-size-summary-index-min' class='right-cell calculated-cell'>920</td><td colspan='3'>&nbsp; of memory.&nbsp;</td></tr>
 <tr><td colspan='6'>&nbsp;</td></tr>
-<tr><td colspan='2'><b>Total user data is expected to use between</b>&nbsp;</td><td id='s-size-summary-total-min' class='right-cell calculated-cell'>2634880</td><td>&nbsp;<b>and</b>&nbsp;</td><td id='s-size-summary-total-max' class='right-cell calculated-cell'>14026880</td><td>&nbsp<b>of memory.</b></td></tr>
+<tr><td colspan='2'><b>Total user data is expected to use between</b>&nbsp;</td><td id='s-size-summary-total-min' class='right-cell calculated-cell'>3114920</td><td>&nbsp;<b>and</b>&nbsp;</td><td id='s-size-summary-total-max' class='right-cell calculated-cell'>15146920</td><td>&nbsp<b>of memory.</b></td></tr>
 </table>
 
                         </div>
@@ -578,7 +583,7 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
             </div>
 
         </div>
-        <div class="documentation"> <a href="http://voltdb.com/docs" class="icon-document" id="iconDoc">VoltDB Documentation</a> <span>Generated by VoltDB 4.9 on 7 Dec 2014 19:27:29 GMT+00:00</span>
+        <div class="documentation"> <a href="http://voltdb.com/docs" class="icon-document" id="iconDoc">VoltDB Documentation</a> <span>Generated by VoltDB 4.9 on 7 Dec 2014 19:34:32 GMT+00:00</span>
             <div class="clear"></div>
         </div>
     </div>
