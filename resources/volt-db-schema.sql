@@ -48,6 +48,34 @@ CREATE TABLE product_views
 CREATE ASSUMEUNIQUE INDEX ProductViewsMessageIdIdx ON product_views (message_id);
 CREATE INDEX ProductViewsSiteIdVisitorIdIdx ON product_views (site_id, visitor_id);
 PARTITION TABLE product_views ON COLUMN visitor_id;
+/********************************************************************************/
+
+/* product_adds contains 1 row for every product add event, meaning a
+   user has added a product to their shopping cart
+*/
+
+CREATE TABLE product_adds
+(
+  message_id            varchar(36)     NOT NULL,
+  site_id               varchar(36)     NOT NULL,
+  visitor_id            varchar(36)     NOT NULL,
+  session_id            varchar(36)     NOT NULL,
+  product_id            varchar(255)    NOT NULL,
+  category_id           varchar(255)    DEFAULT NULL,
+  quantity              integer         NOT NULL,
+  created_at            timestamp       DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT PK_product_adds PRIMARY KEY
+  (
+    site_id, visitor_id, message_id
+  )
+);
+
+CREATE ASSUMEUNIQUE INDEX ProductAddsMessageIdIdx ON product_adds (message_id);
+CREATE INDEX ProductAddsSiteIdVisitorIdIdx ON product_adds (site_id, visitor_id);
+PARTITION TABLE product_adds ON COLUMN visitor_id;
+/********************************************************************************/
+
+/* orders contains 1 row for every order placed on a site */
 
 CREATE TABLE orders
 (
@@ -68,6 +96,11 @@ CREATE TABLE orders
 CREATE ASSUMEUNIQUE INDEX OrdersMessageIdIdx ON orders (message_id);
 CREATE INDEX OrdersSiteIdVisitorIdx ON orders (site_id, visitor_id);
 PARTITION TABLE orders ON COLUMN visitor_id;
+/********************************************************************************/
+
+/* order_products contains 1 row for every product for every order. 1
+   row in the orders table will contain 1 to many in this table 
+*/
 
 CREATE TABLE order_products
 (
@@ -84,6 +117,12 @@ CREATE TABLE order_products
 );
 
 PARTITION TABLE order_products ON COLUMN visitor_id;
+/********************************************************************************/
+
+/* promo_uses contains 1 row for every promo use event, meaning a
+   shopper has used a promotably promo on a shopping website, and
+   completed their purchase.
+*/
 
 CREATE TABLE promo_uses
 (
