@@ -93,7 +93,12 @@ CREATE TABLE promo_uses
   promo_id              varchar(36)     NOT NULL,
   discount_amount       decimal         NOT NULL,
   currency              varchar(3)      DEFAULT 'USD',
-  created_at            timestamp       DEFAULT CURRENT_TIMESTAMP
+  created_at            timestamp       DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT PK_promo_uses PRIMARY KEY
+  (
+    site_id, visitor_id, message_id, promo_id
+  )
 );
 
+CREATE INDEX PromoUsesSiteIdVisitorIdPromoIdIdx ON promo_uses (site_id, visitor_id, promo_id);
 PARTITION TABLE promo_uses ON COLUMN visitor_id;

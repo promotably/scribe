@@ -72,10 +72,10 @@
                     </div>
                     <div class="dataBlockContent" style="padding:0;"> <table class='table table-condensed'>
 <tr><td>Compiled by VoltDB Version</td><td>4.9</td></tr>
-<tr><td>Compiled on</td><td>Sun, 7 Dec 2014 17:50:28 GMT+00:00</td></tr>
+<tr><td>Compiled on</td><td>Sun, 7 Dec 2014 17:56:40 GMT+00:00</td></tr>
 <tr><td>Table Count</td><td>5 (5 partitioned / 0 replicated)</td></tr>
 <tr><td>Materialized View Count</td><td>0</td></tr>
-<tr><td>Index Count</td><td>10</td></tr>
+<tr><td>Index Count</td><td>12</td></tr>
 <tr><td>Procedure Count</td><td>0 (0 partitioned / 0 replicated) (0 read-only / 0 read-write)</td></tr>
 <tr><td>SQL Statement Count</td><td>0</td></tr>
 </table>
@@ -149,10 +149,19 @@
     </thead>
     </table>
 </td></tr>
-<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses' class='togglex'>PROMO_USES</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on VISITOR_ID</small></td><td>7</td><td>0</td><td><span class='label label l-No-PKey'>No-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
+<tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses' class='togglex'>PROMO_USES</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on VISITOR_ID</small></td><td>7</td><td>2 (2 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='7' id='s-promo_uses--dropdown'>
-<p><pre>CREATE TABLE promo_uses (   message_id            varchar(36)     NOT NULL,   site_id               varchar(36)     NOT NULL,   visitor_id            varchar(36)     NOT NULL,   promo_id              varchar(36)     NOT NULL,   discount_amount       decimal         NOT NULL,   currency              varchar(3)      DEFAULT 'USD',   created_at            timestamp       DEFAULT CURRENT_TIMESTAMP );</pre></p>
-<p>No indexes defined on table.</p>
+<p><pre>CREATE TABLE promo_uses (   message_id            varchar(36)     NOT NULL,   site_id               varchar(36)     NOT NULL,   visitor_id            varchar(36)     NOT NULL,   promo_id              varchar(36)     NOT NULL,   discount_amount       decimal         NOT NULL,   currency              varchar(3)      DEFAULT 'USD',   created_at            timestamp       DEFAULT CURRENT_TIMESTAMP,   CONSTRAINT PK_promo_uses PRIMARY KEY   (     site_id, visitor_id, message_id, promo_id   ) );</pre></p>
+    <table class='table tableL2 table-condensed'>
+    <thead><tr><th>Index Name</th><th>Type</th><th>Columns</th><th>Attributes</th></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-promousessiteidvisitoridpromoididx--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-promousessiteidvisitoridpromoididx' class='togglex'>PROMOUSESSITEIDVISITORIDPROMOIDIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, VISITOR_ID, PROMO_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+<tr class='dropdown2'><td colspan='5' id='s-promo_uses-promousessiteidvisitoridpromoididx--dropdown'>
+</td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PROMO_USES</a></td><td>BALANCED_TREE</td><td>SITE_ID, VISITOR_ID, MESSAGE_ID, PROMO_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+<tr class='dropdown2'><td colspan='5' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--dropdown'>
+</td></tr>
+    </thead>
+    </table>
 </td></tr>
 <tr class='primaryrow'><td style='white-space: nowrap;'><i id='s-site_visits--icon' class='icon-chevron-right'></i> <a href='#' id='s-site_visits' class='togglex'>SITE_VISITS</a></td><td><span class='label label l-Table'>Table</span></td><td style='whitespace: nowrap;'><span class='label label-success l-Partitioned'>Partitioned</span><small> on VISITOR_ID</small></td><td>4</td><td>3 (3 unused)</td><td><span class='label label-info l-Has-PKey'>Has-PKey</span></td><td><span class='label label l-No-limit'>No-limit</span></td></tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='7' id='s-site_visits--dropdown'>
@@ -234,9 +243,11 @@ CREATE TABLE PROMO_USES (
    PROMO_ID varchar(36) NOT NULL,
    DISCOUNT_AMOUNT decimal NOT NULL,
    CURRENCY varchar(3) DEFAULT 'USD',
-   CREATED_AT timestamp DEFAULT CURRENT_TIMESTAMP
+   CREATED_AT timestamp DEFAULT CURRENT_TIMESTAMP,
+   CONSTRAINT PK_PROMO_USES PRIMARY KEY (SITE_ID, VISITOR_ID, MESSAGE_ID, PROMO_ID)
 );
 PARTITION TABLE PROMO_USES ON COLUMN VISITOR_ID;
+CREATE INDEX PROMOUSESSITEIDVISITORIDPROMOIDIDX ON PROMO_USES (SITE_ID, VISITOR_ID, PROMO_ID);
 
 CREATE TABLE SITE_VISITS (
    MESSAGE_ID varchar(36) NOT NULL,
@@ -436,14 +447,23 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
 </div></td>
 <td id='s-size-4-rmin' class='right-cell'>421</td>
 <td id='s-size-4-rmax' class='right-cell'>933</td>
-<td id='s-size-4-imin' class='right-cell'>0</td>
-<td id='s-size-4-imax' class='right-cell'>0</td>
-<td id='s-size-4-tmin' class='right-cell calculated-cell'>421000</td>
-<td id='s-size-4-tmax' class='right-cell calculated-cell'>933000</td>
+<td id='s-size-4-imin' class='right-cell'>136</td>
+<td id='s-size-4-imax' class='right-cell'>136</td>
+<td id='s-size-4-tmin' class='right-cell calculated-cell'>557000</td>
+<td id='s-size-4-tmax' class='right-cell calculated-cell'>1069000</td>
 </tr>
 <tr class='tablesorter-childRow'><td class='invert' colspan='6' id='s-size-4--dropdown'>
-<p><pre>CREATE TABLE promo_uses (   message_id            varchar(36)     NOT NULL,   site_id               varchar(36)     NOT NULL,   visitor_id            varchar(36)     NOT NULL,   promo_id              varchar(36)     NOT NULL,   discount_amount       decimal         NOT NULL,   currency              varchar(3)      DEFAULT 'USD',   created_at            timestamp       DEFAULT CURRENT_TIMESTAMP );</pre></p>
-<p>No indexes defined on table.</p>
+<p><pre>CREATE TABLE promo_uses (   message_id            varchar(36)     NOT NULL,   site_id               varchar(36)     NOT NULL,   visitor_id            varchar(36)     NOT NULL,   promo_id              varchar(36)     NOT NULL,   discount_amount       decimal         NOT NULL,   currency              varchar(3)      DEFAULT 'USD',   created_at            timestamp       DEFAULT CURRENT_TIMESTAMP,   CONSTRAINT PK_promo_uses PRIMARY KEY   (     site_id, visitor_id, message_id, promo_id   ) );</pre></p>
+    <table class='table tableL2 table-condensed'>
+    <thead><tr><th>Index Name</th><th>Type</th><th>Columns</th><th>Attributes</th></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-promousessiteidvisitoridpromoididx--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-promousessiteidvisitoridpromoididx' class='togglex'>PROMOUSESSITEIDVISITORIDPROMOIDIDX</a></td><td>BALANCED_TREE</td><td>SITE_ID, VISITOR_ID, PROMO_ID</td><td><span class='label label-info l-Nonunique'>Nonunique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+<tr class='dropdown2'><td colspan='5' id='s-promo_uses-promousessiteidvisitoridpromoididx--dropdown'>
+</td></tr>
+        <tr class='primaryrow2'><td style='white-space: nowrap'><i id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--icon' class='icon-chevron-right'></i> <a href='#' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses' class='togglex'>VOLTDB_AUTOGEN_CONSTRAINT_IDX_PK_PROMO_USES</a></td><td>BALANCED_TREE</td><td>SITE_ID, VISITOR_ID, MESSAGE_ID, PROMO_ID</td><td><span class='label label-success l-Unique'>Unique</span> <span class='label label-important l-Unused'>Unused</span></td></tr>
+<tr class='dropdown2'><td colspan='5' id='s-promo_uses-voltdb_autogen_constraint_idx_pk_promo_uses--dropdown'>
+</td></tr>
+    </thead>
+    </table>
 </td></tr>
 <tr class='primaryrow'><td class='table-view-name' id='s-size-5'>site_visits</td>
 <td><span class='label label l-Table'>Table</span></td>
@@ -488,9 +508,9 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
                         <table class='table size-summary-table'>
 <tr><td id='s-size-summary-table-count' class='right-cell'>5</td><td>tables whose row data  is expected to use between&nbsp;</td><td id='s-size-summary-table-min' class='right-cell calculated-cell'>2046000</td><td>&nbsp;and&nbsp;</td><td id='s-size-summary-table-max' class='right-cell calculated-cell'>9982000</td><td>&nbsp; of memory.&nbsp;</td></tr>
 <tr><td id='s-size-summary-view-count' class='right-cell'>0</td><td>materialized views whose row data  is expected to use about&nbsp;</td><td id='s-size-summary-view-min' class='right-cell calculated-cell'>0</td><td colspan='3'>&nbsp; of memory.&nbsp;</td></tr>
-<tr><td id='s-size-summary-index-count' class='right-cell'>10</td><td>indexes whose key data and overhead  is expected to use about&nbsp;</td><td id='s-size-summary-index-min' class='right-cell calculated-cell'>576</td><td colspan='3'>&nbsp; of memory.&nbsp;</td></tr>
+<tr><td id='s-size-summary-index-count' class='right-cell'>12</td><td>indexes whose key data and overhead  is expected to use about&nbsp;</td><td id='s-size-summary-index-min' class='right-cell calculated-cell'>712</td><td colspan='3'>&nbsp; of memory.&nbsp;</td></tr>
 <tr><td colspan='6'>&nbsp;</td></tr>
-<tr><td colspan='2'><b>Total user data is expected to use between</b>&nbsp;</td><td id='s-size-summary-total-min' class='right-cell calculated-cell'>2046576</td><td>&nbsp;<b>and</b>&nbsp;</td><td id='s-size-summary-total-max' class='right-cell calculated-cell'>9982576</td><td>&nbsp<b>of memory.</b></td></tr>
+<tr><td colspan='2'><b>Total user data is expected to use between</b>&nbsp;</td><td id='s-size-summary-total-min' class='right-cell calculated-cell'>2046712</td><td>&nbsp;<b>and</b>&nbsp;</td><td id='s-size-summary-total-max' class='right-cell calculated-cell'>9982712</td><td>&nbsp<b>of memory.</b></td></tr>
 </table>
 
                         </div>
@@ -499,7 +519,7 @@ JAVA VM:          Java HotSpot(TM) 64-Bit Server VM (24.51-b03, mixed mode)<br/>
             </div>
 
         </div>
-        <div class="documentation"> <a href="http://voltdb.com/docs" class="icon-document" id="iconDoc">VoltDB Documentation</a> <span>Generated by VoltDB 4.9 on 7 Dec 2014 17:50:28 GMT+00:00</span>
+        <div class="documentation"> <a href="http://voltdb.com/docs" class="icon-document" id="iconDoc">VoltDB Documentation</a> <span>Generated by VoltDB 4.9 on 7 Dec 2014 17:56:40 GMT+00:00</span>
             <div class="clear"></div>
         </div>
     </div>
