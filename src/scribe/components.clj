@@ -2,6 +2,7 @@
   (:require [amazonica.aws.kinesis :refer (worker)]
             [clojure.tools.logging :as log]
             [com.stuartsierra.component :as comp]
+            [scribe.config :as cfg]
             [scribe.event-consumer :refer (event-consumer)])
   (:import [com.mchange.v2.c3p0 ComboPooledDataSource]
            [com.amazonaws.auth.profile ProfileCredentialsProvider]
@@ -15,13 +16,13 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defrecord Database [host port user password name connection-pool]
+(defrecord Database [host port user password db connection-pool]
   comp/Lifecycle
 
   (start [component]
     (let [cpds (doto (ComboPooledDataSource.)
                  (.setDriverClass "org.postgresql.Driver")
-                 (.setJdbcUrl (str "jdbc:postgresql://" host ":" port "/" name))
+                 (.setJdbcUrl (str "jdbc:postgresql://" host ":" port "/" db))
                  (.setUser user)
                  (.setPassword password)
                  ;; expire excess connections after 30 minutes of inactivity:
@@ -65,9 +66,9 @@
 
 
 (defn new-system
-  [{{host :host port :port user :user password :password name :name} :database :as config}]
+  [{{host :host port :port user :user password :password db :db} :database :as config}]
   (comp/system-map
-   :database (new-database host port user password name)
+   :database (new-database host port user password db)
    :kinesis (new-kinesis config)
    :app (comp/using
          (event-consumer config)
@@ -75,19 +76,10 @@
 
 (defn init
   []
-  (let [env (keyword (or (System/getenv "ENV")
-                         (System/getProperty "ENV")
-                         "dev"))
-        config {:kinesis {:aws-credentials-profile "promotably"}
-                :event-consumer {:app-name "dev-scribe"
-                                 :stream-name "dev-PromotablyAPIEvents"}
-                :database {:host "localhost"
-                           :port 5432
-                           :user "p_user"
-                           :password "pr0m0"
-                           :name "promotably_dev"}}]
+  (let [c (cfg/lookup)]
+    (log/info c)
     (alter-var-root #'system
-                    (constantly (new-system config)))))
+                    (constantly (new-system c)))))
 
 (defn start
   []
