@@ -1,5 +1,6 @@
 (ns scribe.event-consumer
   (:require [amazonica.aws.kinesis :as k]
+            [clojure.java.jdbc :as j]
             [clojure.tools.logging :as log]
             [cognitect.transit :as transit]
             [com.stuartsierra.component :as comp])
@@ -8,9 +9,18 @@
 
 
 (defn process-message!
-  [database {:keys [message-id event-name attributes] :as message}]
+  [database {:keys [data sequence-number partition-key] :as message}]
   (try
-    (catch Throwable t)))
+    (let [{:keys [message-id event-name attributes]} data
+          d {:event_id message-id
+             :type (name event-name)
+             :shopper_id (:shopper-id attributes)
+             :session_id (:session-id attributes)
+             :site_id (:site-id attributes)
+             :promo_id (:promo-id attributes)}]
+      (j/insert! (:connection-pool database) :events d))
+    (catch Throwable t
+      (log/error t))))
 
 
 (defn deserialize
@@ -35,7 +45,7 @@
                              :app (get-in config [:event-consumer :app-name])
                              :stream (get-in config [:event-consumer :stream-name])
                              :checkpoint false
-                             :deserialize deserialize
+                             :deserializer deserialize
                              :processor (fn [messages]
                                           (doseq [msg messages]
                                             (process-message! database msg)))))

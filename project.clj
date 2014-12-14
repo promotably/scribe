@@ -8,8 +8,10 @@
                  [com.cognitect/transit-clj "0.8.259"]
                  [com.mchange/c3p0 "0.9.2.1"]
                  [com.stuartsierra/component "0.2.2"]
+                 [log4j/log4j "1.2.17"]
                  [org.clojure/clojure "1.6.0"]
                  [org.clojure/java.jdbc "0.3.6"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [postgresql "9.1-901-1.jdbc4"]]
+                 [postgresql "9.3-1102.jdbc4"]]
+  :main scribe.core
   :repositories {"local" "file:repo"})
