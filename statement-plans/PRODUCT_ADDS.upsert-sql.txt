@@ -1,5 +1,0 @@
-SQL: UPSERT INTO PRODUCT_ADDS VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-PLAN:
-UPSERT into "PRODUCT_ADDS"
- MATERIALIZE TUPLE from parameters and/or literals
-
