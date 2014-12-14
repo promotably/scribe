@@ -1,14 +1,16 @@
 # scribe
 
-A Clojure library designed to ... well, that part is up to you.
+Consumer application that takes event data off the kinesis stream and inserts them into promotably's analytics database
 
 ## Usage
 
-FIXME
+```lein run```
 
-## License
+## Environment Variables
 
-Copyright © 2014 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+RDS_HOST - the hostname of the postgres analytics database
+RDS_DB_NAME - the name of the database
+RDS_PORT - the port for the database connection
+RDS_USER - the user for connecting to the database
+RDS_PW - the user's password for connecting to the database
+KINESIS_A - the kinesis stream name scribe should consume events on
