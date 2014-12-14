@@ -48,11 +48,13 @@
                 :env :test}
    :staging    {:database (get-database-config)
                 :kinesis {}
-                :event-consumer (get-event-consumer-config)
+                :event-consumer (assoc (get-event-consumer-config)
+                                  :app-name "staging-scribe")
                 :env :staging}
    :production {:database (get-database-config)
                 :kinesis {}
-                :event-consumer (get-event-consumer-config)
+                :event-consumer (assoc (get-event-consumer-config)
+                                  :app-name "production-scribe")
                 :env :production}})
 
 (defn lookup
