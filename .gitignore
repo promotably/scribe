@@ -7,3 +7,8 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
+/.nrepl-port
+/src/scribe/version.clj
+*~
+.vagrant
+/.idea

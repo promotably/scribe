@@ -1,14 +1,55 @@
 (ns scribe.components
   (:require [amazonica.aws.kinesis :refer (worker)]
             [clojure.tools.logging :as log]
+            [clojure.tools.nrepl.server :as nrepl-server]
+            [cider.nrepl :refer (cider-nrepl-handler)]
+            [clj-logging-config.log4j :as log-config]
             [com.stuartsierra.component :as comp]
-            [scribe.config :as cfg]
-            [scribe.event-consumer :refer (event-consumer)])
+            [scribe.config :as config]
+            [scribe.event-consumer :as ec])
   (:import [com.mchange.v2.c3p0 ComboPooledDataSource]
            [com.amazonaws.auth.profile ProfileCredentialsProvider]
            [com.amazonaws.auth DefaultAWSCredentialsProviderChain]))
 
-(def system nil)
+;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; logging component
+;;
+;;;;;;;;;;;;;;;;;;;;;;
+
+(defrecord LoggingComponent [config]
+  comp/Lifecycle
+  (start [this]
+    (log-config/set-logger!
+     "scribe"
+     :name (-> config :logging :name)
+     :level (-> config :logging :level)
+     :out (-> config :logging :out))
+    (log/logf :info "Environment is %s" (-> config :env))
+    this)
+  (stop [this]
+    this))
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; repl component
+;;
+;;;;;;;;;;;;;;;;;;;;;;
+
+(defrecord ReplComponent [port config logging]
+  comp/Lifecycle
+  (start [this]
+    (when ((-> config :env) #{:dev :localdev})
+      (log/info (format "Starting cider (nrepl) on %d" port))
+      (assoc this :server (clojure.tools.nrepl.server/start-server
+                           :port port
+                           :handler cider.nrepl/cider-nrepl-handler))))
+  (stop [this]
+    (if ((-> config :env) #{:dev :localdev})
+      (when (:server this)
+        (log/info (format "Stopping cider (nrepl)"))
+        (clojure.tools.nrepl.server/stop-server (:server this))))
+    (dissoc this :server)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -16,11 +57,12 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defrecord Database [host port user password db connection-pool]
+(defrecord Database [config logging]
   comp/Lifecycle
 
   (start [component]
-    (let [cpds (doto (ComboPooledDataSource.)
+    (let [{:keys [host port user password db]} config
+          cpds (doto (ComboPooledDataSource.)
                  (.setDriverClass "org.postgresql.Driver")
                  (.setJdbcUrl (str "jdbc:postgresql://" host ":" port "/" db))
                  (.setUser user)
@@ -32,14 +74,12 @@
       (assoc component :connection-pool {:datasource cpds})))
   (stop [component]
     (try
-      (.close connection-pool)
+      (when-let [cp (:connection-pool component)]
+        (.close (:connection-pool cp))
+        (dissoc component :connection-pool))
       (catch Exception e
-        (log/error e)))))
-
-(defn new-database
-  [host port user password name]
-  (map->Database {:host host :port port :user user :password password :name name}))
-
+        (log/error e)
+        component))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -47,7 +87,7 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defrecord Kinesis [config credentials]
+(defrecord Kinesis [config logging]
   comp/Lifecycle
   (start [component]
     (log/info "Starting Kinesis")
@@ -58,39 +98,22 @@
             (DefaultAWSCredentialsProviderChain.))]
       (assoc component :credentials cp)))
   (stop [component]
-    (log/info "Stopping Kinesis")))
+    (log/info "Stopping Kinesis")
+    (dissoc component :credentials)))
 
-(defn new-kinesis
-  [config]
-  (map->Kinesis {:config config}))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; High Level Application System
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-(defn new-system
-  [{{host :host port :port user :user password :password db :db} :database :as config}]
+(defn system
+  [{:keys [port repl-port] :as options}]
   (comp/system-map
-   :database (new-database host port user password db)
-   :kinesis (new-kinesis config)
-   :app (comp/using
-         (event-consumer config)
-         [:database :kinesis])))
+   :config   (comp/using (config/map->Config {}) [])
+   :logging  (comp/using (map->LoggingComponent {}) [:config])
+   :cider    (comp/using (map->ReplComponent {:port repl-port}) [:config :logging])
+   :database (comp/using (map->Database {}) [:config :logging])
+   :kinesis  (comp/using (map->Kinesis {}) [:config :logging])
+   :app      (comp/using (ec/map->EventConsumer {}) [:config :database :kinesis])))
 
-(defn init
-  []
-  (let [c (cfg/lookup)]
-    (log/info c)
-    (alter-var-root #'system
-                    (constantly (new-system c)))))
-
-(defn start
-  []
-  (alter-var-root #'system comp/start))
-
-(defn stop
-  []
-  (alter-var-root #'system
-                  (fn [s] (when s (comp/stop s)))))
-
-(defn go
-  []
-  (init)
-  (start))

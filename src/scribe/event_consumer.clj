@@ -37,7 +37,7 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defrecord EventConsumer [config kinesis database worker worker-thread]
+(defrecord EventConsumer [config kinesis database]
   comp/Lifecycle
   (start [component]
     (log/info "Starting Event Consumer")
@@ -55,9 +55,8 @@
                         :worker-thread t})))
   (stop [component]
     (log/info "Stopping Event Consumer")
-    (.shutdown worker)
-    (.stop worker-thread)))
-
-(defn event-consumer
-  [config]
-  (map->EventConsumer {:config config}))
+    (if (:worker component)
+      (.shutdown (:worker component)))
+    (if (:worker-thread component)
+      (.stop (:worker-thread component)))
+    (dissoc component :worker :worker-thread)))

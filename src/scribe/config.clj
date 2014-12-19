@@ -1,6 +1,7 @@
 (ns ^{:author "tsteffes@promotably.com"
       :doc "One stop shop for all you application configuration needs"}
-  scribe.config)
+  scribe.config
+  (:require [com.stuartsierra.component :as component]))
 
 
 (defn- get-database-config
@@ -63,3 +64,21 @@
                              (System/getenv "ENV")
                              "dev"))]
     (sys-env app-config)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; System component
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defrecord Config []
+  component/Lifecycle
+  (start [component]
+    (let [m (lookup)]
+      (if ((:env m) #{:production :integration})
+        (alter-var-root #'*warn-on-reflection* (constantly false))
+        (alter-var-root #'*warn-on-reflection* (constantly true)))
+      (merge component m)))
+  (stop
+    [component]
+    component))
