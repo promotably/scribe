@@ -61,7 +61,7 @@
   comp/Lifecycle
 
   (start [component]
-    (let [{:keys [host port user password db]} config
+    (let [{{:keys [host port user password db]} :database} config
           cpds (doto (ComboPooledDataSource.)
                  (.setDriverClass "org.postgresql.Driver")
                  (.setJdbcUrl (str "jdbc:postgresql://" host ":" port "/" db))
@@ -71,6 +71,7 @@
                  (.setMaxIdleTimeExcessConnections (* 30 60))
                  ;; expire connections after 3 hours of inactivity:
                  (.setMaxIdleTime (* 3 60 60)))]
+      (log/infof "Starting database component %s %s" host port)
       (assoc component :connection-pool {:datasource cpds})))
   (stop [component]
     (try
