@@ -3,6 +3,11 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :profiles {:uberjar {:aot :all}
+             :dev {:dependencies [[midje "1.6.3"
+                                   :exclusions [joda-time
+                                                org.clojure/tools.macro]]]
+                   :plugins [[lein-midje "3.0.0"]]}}
   :plugins [[org.clojars.cvillecsteele/lein-git-version "1.0.2"]
             [cider/cider-nrepl "0.8.0"]]
   :dependencies [[amazonica "0.3.4"]
