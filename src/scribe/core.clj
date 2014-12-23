@@ -27,6 +27,7 @@
 (def cli-options
   [["-p" "--port PORT" "Listening port" :default 3000]
    ["-r" "--repl-port PORT" "Repl / Cider listening port" :default 55555]
+   ["-c" "--config-file FILE" "Configuration file name"]
    ;; A non-idempotent option
    ["-v" nil "Verbosity level"
     :id :verbosity

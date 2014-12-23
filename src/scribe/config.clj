@@ -3,16 +3,24 @@
   scribe.config
   (:require [com.stuartsierra.component :as component]))
 
+;; File-based config data
+(def configfile-data {})
+
+(defn- get-config-value
+  [key & [default]]
+  (or (System/getenv key)
+      (System/getProperty key)
+      (get configfile-data key default)))
 
 (defn- get-database-config
   "Checks environment variables for database config settings. These
   should always be present on environments deployed to AWS"
   []
-  (let [db-host (System/getenv "RDS_HOST")
-        db-name (System/getenv "RDS_DB_NAME")
-        db-port (if-let [p (System/getenv "RDS_PORT")] (read-string p))
-        db-user (System/getenv "RDS_USER")
-        db-pwd (System/getenv "RDS_PW")]
+  (let [db-host (get-config-value "RDS_HOST")
+        db-name (get-config-value "RDS_DB_NAME")
+        db-port (if-let [p (get-config-value "RDS_PORT")] (read-string p))
+        db-user (get-config-value "RDS_USER")
+        db-pwd (get-config-value "RDS_PW")]
     {:db db-name
      :user db-user
      :password db-pwd
@@ -24,7 +32,7 @@
   "Checks environment variables for kinesis config settings. These
   should always be present on environments deployed to AWS"
   []
-  (let [sn (System/getenv "KINESIS_A")]
+  (let [sn (get-config-value "KINESIS_A")]
     {:stream-name sn}))
 
 
@@ -71,9 +79,11 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defrecord Config []
+(defrecord Config [config-file]
   component/Lifecycle
   (start [component]
+    (if config-file
+      (alter-var-root #'configfile-data (-> config-file slurp read-string constantly)))
     (let [m (lookup)]
       (if ((:env m) #{:production :integration})
         (alter-var-root #'*warn-on-reflection* (constantly false))

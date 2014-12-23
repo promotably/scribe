@@ -109,9 +109,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn system
-  [{:keys [port repl-port] :as options}]
+  [{:keys [config-file port repl-port] :as options}]
   (comp/system-map
-   :config   (comp/using (config/map->Config {}) [])
+   :config   (comp/using (config/map->Config options) [])
    :logging  (comp/using (map->LoggingComponent {}) [:config])
    :cider    (comp/using (map->ReplComponent {:port repl-port}) [:config :logging])
    :database (comp/using (map->Database {}) [:config :logging])
