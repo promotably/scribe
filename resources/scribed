@@ -16,7 +16,6 @@ INSTALL_JAR=$INSTALL_DIR/"$NAME"-"$VERSION".jar
 JAVA_HOME=/usr/lib/jvm/jre
 mkdir -p $PID_DIR
 test -d $LOG_DIR || mkdir $LOG_DIR
-test -f $CONFIG_FILE || . $CONFIG_FILE
 
 # returns 0 if PID in file is running, 1 if otherwise
 process_running() {
@@ -50,7 +49,7 @@ start() {
               -outfile "$LOG_FILE" \
               -errfile "$ERR_FILE" \
               -pidfile "$PID_FILE" \
-              scribe.core
+              scribe.core -c $CONFIG_FILE
         exit 0
 }       
 
@@ -66,7 +65,7 @@ stop() {
                       -outfile "$LOG_FILE" \
                       -errfile "$ERR_FILE" \
                       -pidfile "$PID_FILE" \
-                      scribe.core
+                      scribe.core -c $CONFIG_FILE
         fi
 }
 
