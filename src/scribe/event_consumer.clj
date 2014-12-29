@@ -19,6 +19,13 @@
 
       value)))
 
+(defn- string->uuid
+  [s]
+  (condp = (class s)
+    java.util.UUID s
+    java.lang.String (java.util.UUID/fromString s)
+    s))
+
 (defn process-message!
   [database {:keys [data sequence-number partition-key] :as message}]
   (log/trace message)
@@ -30,10 +37,10 @@
                                           "SELECT upsertEvent(?,?,?,?,?,?,?);")
                         (.setObject 1 (name event-name))
                         (.setObject 2 message-id)
-                        (.setObject 3 (:site-id attributes))
-                        (.setObject 4 (:shopper-id attributes))
-                        (.setObject 5 (:session-id attributes))
-                        (.setObject 6 (:promo-id attributes))
+                        (.setObject 3 (string->uuid (:site-id attributes)))
+                        (.setObject 4 (string->uuid (:shopper-id attributes)))
+                        (.setObject 5 (string->uuid (:session-id attributes)))
+                        (.setObject 6 (string->uuid (:promo-id attributes)))
                         (.setObject 7 (doto (PGobject.)
                                         (.setValue (write-str attributes :value-fn serialize-json))
                                         (.setType "json"))))]
