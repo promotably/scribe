@@ -36,7 +36,8 @@
     {:stream-name sn}))
 
 
-(def app-config
+(defn app-config
+  []
   {:dev        {:database {:db "promotably_dev"
                            :user "p_user"
                            :password "pr0m0"
@@ -71,7 +72,7 @@
   (let [sys-env (keyword (or (System/getProperty "ENV")
                              (System/getenv "ENV")
                              "dev"))]
-    (sys-env app-config)))
+    (sys-env (app-config))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
