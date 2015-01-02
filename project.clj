@@ -11,7 +11,7 @@
   :plugins [[org.clojars.cvillecsteele/lein-git-version "1.0.2"]
             [cider/cider-nrepl "0.8.0"]]
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [amazonica "0.3.4" :exclusions [joda-time]]
+                 [amazonica "0.3.6" :exclusions [joda-time]]
                  [clojure.joda-time "0.2.0" :exclusions [joda-time]]
                  [joda-time/joda-time "2.5"]
                  [com.cognitect/transit-clj "0.8.259"]

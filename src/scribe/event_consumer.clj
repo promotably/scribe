@@ -72,19 +72,20 @@
     (let [w (first (k/worker :credentials (:credentials kinesis)
                              :app (get-in config [:event-consumer :app-name])
                              :stream (get-in config [:event-consumer :stream-name])
-                             :checkpoint false
                              :deserializer deserialize
+                             :checkpoint 5
                              :processor (fn [messages]
+                                          (log/infof "Processing %d messages"
+                                                     (count messages))
                                           (doseq [msg messages]
+                                            (log/info msg)
                                             (process-message! database msg)))))
-          t (Thread. w)]
-      (.start t)
+          wid @(future (.run w))]
+      (log/info "Event Consumer Worker Started With ID %s" wid)
       (merge component {:worker w
-                        :worker-thread t})))
+                        :worker-id wid})))
   (stop [component]
     (log/info "Stopping Event Consumer")
     (if (:worker component)
       (.shutdown (:worker component)))
-    (if (:worker-thread component)
-      (.stop (:worker-thread component)))
-    (dissoc component :worker :worker-thread)))
+    (dissoc component :worker)))
