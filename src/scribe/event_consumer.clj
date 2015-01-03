@@ -5,7 +5,8 @@
             [clojure.tools.logging :as log]
             [cognitect.transit :as transit]
             [com.stuartsierra.component :as comp])
-  (:import [java.nio ByteBuffer]
+  (:import [java.math BigDecimal]
+           [java.nio ByteBuffer]
            [java.io ByteArrayInputStream]
            [java.text SimpleDateFormat]
            [org.postgresql.util PGobject]))
@@ -16,7 +17,6 @@
     (condp = (class value)
       java.util.UUID (str value)
       java.util.Date (.format df value)
-
       value)))
 
 (defn- string->uuid
@@ -26,6 +26,34 @@
     java.lang.String (java.util.UUID/fromString s)
     s))
 
+(defn- record-promo-redemption!
+  [database {:keys [event-id site-id order-id promo-code discount shopper-id session-id]}]
+  (let [conn (.getConnection (get-in database [:connection-pool :datasource]))
+        statement (doto (.prepareCall conn
+                                      "SELECT upsertPromoRedemption(?,?,?,?,?,?,?);")
+                    (.setObject 1 event-id)
+                    (.setObject 2 site-id)
+                    (.setObject 3 order-id)
+                    (.setObject 4 promo-code)
+                    (.setObject 5 discount)
+                    (.setObject 6 shopper-id)
+                    (.setObject 7 session-id))]
+    (.execute statement)))
+
+(defn- process-thankyou!
+  "If it's a thankyou event, we need to do some additional processing"
+  [database {:keys [message-id event-name attributes] :as data}]
+  (let [{:keys [applied-coupons site-id order-id shopper-id session-id]} attributes]
+    (doseq [c applied-coupons]
+      (record-promo-redemption! database
+                                {:event-id message-id
+                                 :site-id (string->uuid site-id)
+                                 :order-id order-id
+                                 :promo-code (:code c)
+                                 :discount (BigDecimal. (:discount c))
+                                 :shopper-id (string->uuid shopper-id)
+                                 :session-id (string->uuid session-id)}))))
+
 (defn process-message!
   [database {:keys [data sequence-number partition-key] :as message}]
   (log/trace message)
@@ -33,7 +61,8 @@
     (let [{:keys [message-id event-name attributes]} data]
       ;; upsertEvent(_type text, eventId uuid, siteId uuid, shopperId
       ;; uuid, sessionId uuid, promoId uuid, _data json)
-      (let [statement (doto (.prepareCall (.getConnection (get-in database [:connection-pool :datasource]))
+      (let [conn (.getConnection (get-in database [:connection-pool :datasource]))
+            statement (doto (.prepareCall conn
                                           "SELECT upsertEvent(?,?,?,?,?,?,?);")
                         (.setObject 1 (name event-name))
                         (.setObject 2 message-id)
@@ -44,7 +73,9 @@
                         (.setObject 7 (doto (PGobject.)
                                         (.setValue (write-str attributes :value-fn serialize-json))
                                         (.setType "json"))))]
-        (.execute statement)))
+        (.execute statement)
+        (when (= event-name :trackthankyou)
+          (process-thankyou! database data))))
     (catch java.sql.BatchUpdateException be
       (log/error (.getNextException be)))
     (catch Throwable t
@@ -56,8 +87,9 @@
   (let [ba (byte-array (.remaining byte-buffer))]
     (.get byte-buffer ba)
     (let [in (ByteArrayInputStream. ba)
-          rdr (transit/reader in :json)]
-      (transit/read rdr))))
+          rdr (transit/reader in :json)
+          d (transit/read rdr)]
+      d)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -75,10 +107,9 @@
                              :deserializer deserialize
                              :checkpoint 5
                              :processor (fn [messages]
-                                          (log/infof "Processing %d messages"
+                                          (log/debugf "Processing %d messages"
                                                      (count messages))
                                           (doseq [msg messages]
-                                            (log/info msg)
                                             (process-message! database msg)))))
           wid @(future (.run w))]
       (log/info "Event Consumer Worker Started With ID %s" wid)
