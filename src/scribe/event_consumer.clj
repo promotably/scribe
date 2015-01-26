@@ -27,10 +27,9 @@
     s))
 
 (defn- record-promo-redemption!
-  [database {:keys [event-id site-id order-id promo-code discount shopper-id
+  [conn {:keys [event-id site-id order-id promo-code discount shopper-id
                     site-shopper-id session-id]}]
-  (let [conn (.getConnection (get-in database [:connection-pool :datasource]))
-        statement (doto (.prepareCall conn
+  (let [statement (doto (.prepareCall conn
                                       "SELECT upsertPromoRedemption(?,?,?,?,?,?,?,?);")
                     (.setObject 1 event-id)
                     (.setObject 2 site-id)
@@ -44,10 +43,10 @@
 
 (defn- process-thankyou!
   "If it's a thankyou event, we need to do some additional processing"
-  [database {:keys [message-id event-name attributes] :as data}]
+  [conn {:keys [message-id event-name attributes] :as data}]
   (let [{:keys [applied-coupons site-id order-id shopper-id site-shopper-id session-id]} attributes]
     (doseq [c applied-coupons]
-      (record-promo-redemption! database
+      (record-promo-redemption! conn
                                 {:event-id message-id
                                  :site-id (string->uuid site-id)
                                  :order-id order-id
@@ -77,9 +76,12 @@
                         (.setObject 8 (doto (PGobject.)
                                         (.setValue (write-str attributes :value-fn serialize-json))
                                         (.setType "json"))))]
-        (.execute statement)
-        (when (= event-name :trackthankyou)
-          (process-thankyou! database data))))
+        (try
+          (.execute statement)
+          (when (= event-name :trackthankyou)
+            (process-thankyou! conn data))
+          (finally
+            (.close conn)))))
     (catch java.sql.BatchUpdateException be
       (log/error (.getNextException be)))
     (catch Throwable t
