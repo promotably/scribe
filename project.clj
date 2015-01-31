@@ -1,8 +1,6 @@
-(defproject scribe "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+(defproject scribe "version placeholder"
+  :description "Promotably Scribe"
+  :url "https://github.com/promotably/scribe"
   :profiles {:uberjar {:aot :all}
              :dev {:dependencies [[midje "1.6.3"
                                    :exclusions [joda-time
