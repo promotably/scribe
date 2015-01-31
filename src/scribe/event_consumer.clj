@@ -78,7 +78,7 @@
                                         (.setType "json"))))]
         (try
           (.execute statement)
-          (when (= event-name :trackthankyou)
+          (when (= event-name :thankyou)
             (process-thankyou! conn data))
           (finally
             (.close conn)))))
