@@ -9,7 +9,7 @@
                                                 org.clojure/tools.macro]]]
                    :plugins [[lein-midje "3.0.0"]]}}
   :plugins [[org.clojars.cvillecsteele/lein-git-version "1.0.2"]
-            [cider/cider-nrepl "0.9.0-SNAPSHOT"]]
+            [cider/cider-nrepl "0.8.2"]]
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [amazonica "0.3.6" :exclusions [joda-time]]
                  [clojure.joda-time "0.2.0" :exclusions [joda-time]]
