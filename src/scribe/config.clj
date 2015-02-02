@@ -61,6 +61,11 @@
                 :event-consumer (assoc (get-event-consumer-config)
                                   :app-name "staging-scribe")
                 :env :staging}
+   :integration {:database (get-database-config)
+                 :kinesis {}
+                 :event-consumer (assoc (get-event-consumer-config)
+                                   :app-name "integration-scribe")
+                 :env :integration}
    :production {:database (get-database-config)
                 :kinesis {}
                 :event-consumer (assoc (get-event-consumer-config)
@@ -69,9 +74,7 @@
 
 (defn lookup
   []
-  (let [sys-env (keyword (or (System/getProperty "ENV")
-                             (System/getenv "ENV")
-                             "dev"))]
+  (let [sys-env (keyword (get-config-value "ENV" "dev"))]
     (sys-env (app-config))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
