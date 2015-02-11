@@ -1,6 +1,6 @@
 (ns scribe.event-consumer
   (:require [amazonica.aws.kinesis :as k]
-            [clojure.data.json :refer (write-str)]
+            [cheshire.core :refer [generate-string]]
             [clojure.java.jdbc :as j]
             [clojure.tools.logging :as log]
             [cognitect.transit :as transit]
@@ -10,14 +10,6 @@
            [java.io ByteArrayInputStream]
            [java.text SimpleDateFormat]
            [org.postgresql.util PGobject]))
-
-(let [df (SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSSZ")]
-  (defn- serialize-json
-    [key value]
-    (condp = (class value)
-      java.util.UUID (str value)
-      java.util.Date (.format df value)
-      value)))
 
 (defn- string->uuid
   [s]
@@ -74,7 +66,7 @@
                         (.setObject 6 (string->uuid (:session-id attributes)))
                         (.setObject 7 (string->uuid (:promo-id attributes)))
                         (.setObject 8 (doto (PGobject.)
-                                        (.setValue (write-str attributes :value-fn serialize-json))
+                                        (.setValue (generate-string attributes))
                                         (.setType "json"))))]
         (try
           (.execute statement)

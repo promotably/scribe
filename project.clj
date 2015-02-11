@@ -17,13 +17,13 @@
                  [com.stuartsierra/component "0.2.2"]
                  [clj-logging-config "1.9.12"]
                  [log4j/log4j "1.2.17"]
-                 [org.clojure/data.json "0.2.5"]
                  [org.clojure/java.jdbc "0.3.6"]
                  [org.clojure/tools.macro "0.1.2"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.nrepl "0.2.6"]
                  [org.clojure/tools.cli "0.3.1"]
                  [postgresql "9.3-1102.jdbc4"]
-                 [org.apache.commons/commons-daemon "1.0.9"]]
+                 [org.apache.commons/commons-daemon "1.0.9"]
+                 [cheshire "5.4.0"]]
   :main scribe.core
   :repositories {"local" "file:repo"})
