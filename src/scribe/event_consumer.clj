@@ -77,6 +77,7 @@
     (catch java.sql.BatchUpdateException be
       (log/error (.getNextException be)))
     (catch Throwable t
+      (log/info "Offending Message: " message)
       (log/error t))))
 
 
