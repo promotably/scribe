@@ -20,7 +20,7 @@
 
 (defn- record-promo-redemption!
   [conn {:keys [event-id site-id order-id promo-code discount shopper-id
-                    site-shopper-id session-id]}]
+                    site-shopper-id session-id control-group]}]
   (let [statement (doto (.prepareCall conn
                                       "SELECT upsertPromoRedemption(?,?,?,?,?,?,?,?);")
                     (.setObject 1 event-id)
@@ -30,13 +30,14 @@
                     (.setObject 5 discount)
                     (.setObject 6 shopper-id)
                     (.setObject 7 site-shopper-id)
-                    (.setObject 8 session-id))]
+                    (.setObject 8 session-id)
+                    (.setObject 9 control-group))]
     (.execute statement)))
 
 (defn- process-thankyou!
   "If it's a thankyou event, we need to do some additional processing"
   [conn {:keys [message-id event-name attributes] :as data}]
-  (let [{:keys [applied-coupons site-id order-id shopper-id site-shopper-id session-id]} attributes]
+  (let [{:keys [applied-coupons site-id order-id shopper-id site-shopper-id session-id control-group]} attributes]
     (doseq [c applied-coupons]
       (record-promo-redemption! conn
                                 {:event-id message-id
@@ -46,7 +47,8 @@
                                  :discount (BigDecimal. (:discount c))
                                  :shopper-id (string->uuid shopper-id)
                                  :site-shopper-id (string->uuid site-shopper-id)
-                                 :session-id (string->uuid session-id)}))))
+                                 :session-id (string->uuid session-id)
+                                 :control-group (boolean control-group)}))))
 
 (defn process-message!
   [database {:keys [data sequence-number partition-key] :as message}]
@@ -57,7 +59,7 @@
       ;; uuid, sessionId uuid, promoId uuid, _data json)
       (let [conn (.getConnection (get-in database [:connection-pool :datasource]))
             statement (doto (.prepareCall conn
-                                          "SELECT upsertEvent(?,?,?,?,?,?,?,?);")
+                                          "SELECT upsertEvent(?,?,?,?,?,?,?,?,?);")
                         (.setObject 1 (name event-name))
                         (.setObject 2 message-id)
                         (.setObject 3 (string->uuid (:site-id attributes)))
@@ -65,7 +67,8 @@
                         (.setObject 5 (string->uuid (:site-shopper-id attributes)))
                         (.setObject 6 (string->uuid (:session-id attributes)))
                         (.setObject 7 (string->uuid (:promo-id attributes)))
-                        (.setObject 8 (doto (PGobject.)
+                        (.setObject 8 (boolean (:control-group attributes)))
+                        (.setObject 9 (doto (PGobject.)
                                         (.setValue (generate-string attributes))
                                         (.setType "json"))))]
         (try
