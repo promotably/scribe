@@ -45,7 +45,7 @@
                            :port 5432}
                 :kinesis {:aws-credentials-profile "promotably"}
                 :event-consumer {:stream-name "dev-PromotablyAPIEvents"
-                                 :app-name "dev-scribe"}
+                                 :app-name (str "dev-scribe-" (System/getProperty "user.name"))}
                 :env :dev}
    :test       {:database {:db "promotably_test"
                            :user "p_user"
