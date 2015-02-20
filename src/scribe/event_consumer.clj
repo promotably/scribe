@@ -18,70 +18,71 @@
     java.lang.String (java.util.UUID/fromString s)
     s))
 
-(defn- record-promo-redemption!
-  [conn {:keys [event-id site-id order-id promo-code discount shopper-id
-                    site-shopper-id session-id control-group]}]
-  (let [statement (doto (.prepareCall conn
-                                      "SELECT upsertPromoRedemption(?,?,?,?,?,?,?,?);")
-                    (.setObject 1 event-id)
-                    (.setObject 2 site-id)
-                    (.setObject 3 order-id)
-                    (.setObject 4 promo-code)
-                    (.setObject 5 discount)
-                    (.setObject 6 shopper-id)
-                    (.setObject 7 site-shopper-id)
-                    (.setObject 8 session-id)
-                    (.setObject 9 control-group))]
-    (.execute statement)))
+
+(defn- insert-event!
+  "Attempts to insert to the events table."
+  [database the-event]
+  (j/insert! (:connection-pool database)
+             :events
+             the-event))
+
+(defn- insert-promo-redemption!
+  "Attempts to insert to the promo_redemptions table. If a duplicate (by event_id) is inserted,
+   the exception is caught. Any other exceptions are re-thrown"
+  [database the-pr]
+  (j/insert! (:connection-pool database)
+             :promo_redemptions
+             the-pr))
 
 (defn- process-thankyou!
   "If it's a thankyou event, we need to do some additional processing"
-  [conn {:keys [message-id event-name attributes] :as data}]
-  (let [{:keys [applied-coupons site-id order-id shopper-id site-shopper-id session-id control-group]} attributes]
+  [database {:keys [message-id event-name attributes] :as data}]
+  (let [{:keys [applied-coupons site-id order-id shopper-id site-shopper-id
+                session-id control-group]} attributes]
     (doseq [c applied-coupons]
-      (record-promo-redemption! conn
-                                {:event-id message-id
-                                 :site-id (string->uuid site-id)
-                                 :order-id order-id
-                                 :promo-code (:code c)
-                                 :discount (BigDecimal. (:discount c))
-                                 :shopper-id (string->uuid shopper-id)
-                                 :site-shopper-id (string->uuid site-shopper-id)
-                                 :session-id (string->uuid session-id)
-                                 :control-group (boolean control-group)}))))
+      (let [site-uuid (string->uuid site-id)
+            p (first (j/query (:connection-pool database)
+                              ["select p.id from promos p
+                                            join sites s on p.site_id=s.id
+                                            where s.site_id=? and p.code=?"
+                               site-uuid
+                               (:code c)]))]
+        (insert-promo-redemption! database
+                                  {:event_id message-id
+                                   :site_id site-uuid
+                                   :order_id order-id
+                                   :promo_code (:code c)
+                                   :promo_id (when p (:id p))
+                                   :discount (BigDecimal. (:discount c))
+                                   :shopper_id (string->uuid shopper-id)
+                                   :site_shopper_id (string->uuid site-shopper-id)
+                                   :session_id (string->uuid session-id)
+                                   :control_group (boolean control-group)})))))
 
 (defn process-message!
   [database {:keys [data sequence-number partition-key] :as message}]
   (log/trace message)
   (try
     (let [{:keys [message-id event-name attributes]} data]
-      ;; upsertEvent(_type text, eventId uuid, siteId uuid, shopperId
-      ;; uuid, sessionId uuid, promoId uuid, _data json)
-      (let [conn (.getConnection (get-in database [:connection-pool :datasource]))
-            statement (doto (.prepareCall conn
-                                          "SELECT upsertEvent(?,?,?,?,?,?,?,?,?);")
-                        (.setObject 1 (name event-name))
-                        (.setObject 2 message-id)
-                        (.setObject 3 (string->uuid (:site-id attributes)))
-                        (.setObject 4 (string->uuid (:shopper-id attributes)))
-                        (.setObject 5 (string->uuid (:site-shopper-id attributes)))
-                        (.setObject 6 (string->uuid (:session-id attributes)))
-                        (.setObject 7 (string->uuid (:promo-id attributes)))
-                        (.setObject 8 (boolean (:control-group attributes)))
-                        (.setObject 9 (doto (PGobject.)
-                                        (.setValue (generate-string attributes))
-                                        (.setType "json"))))]
+      (let [the-event {:event_id message-id
+                       :type (name event-name)
+                       :site_id (string->uuid (:site-id attributes))
+                       :shopper_id (string->uuid (:shopper-id attributes))
+                       :site_shopper_id (string->uuid (:site-shopper-id attributes))
+                       :session_id (string->uuid (:session-id attributes))
+                       :promo_id (string->uuid (:promo-id attributes))
+                       :data (doto (PGobject.)
+                               (.setValue (generate-string attributes))
+                               (.setType "json"))}]
         (try
-          (.execute statement)
+          (insert-event! database the-event)
           (when (= event-name :thankyou)
-            (process-thankyou! conn data))
-          (finally
-            (.close conn)))))
-    (catch java.sql.BatchUpdateException be
-      (log/error (.getNextException be)))
-    (catch Throwable t
-      (log/info "Offending Message: " message)
-      (log/error t))))
+            (process-thankyou! database data))
+          (catch org.postgresql.util.PSQLException ex
+            ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
+            (if (= (.getErrorCode ex) 23505)
+              (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))
+              (throw ex))))))))
 
 
 (defn deserialize
