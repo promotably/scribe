@@ -59,17 +59,17 @@
    :staging    {:database (get-database-config)
                 :kinesis {}
                 :event-consumer (assoc (get-event-consumer-config)
-                                  :app-name "staging-scribe")
+                                  :app-name (get-config-value "STACKNAME"))
                 :env :staging}
    :integration {:database (get-database-config)
                  :kinesis {}
                  :event-consumer (assoc (get-event-consumer-config)
-                                   :app-name "integration-scribe")
+                                   :app-name (get-config-value "STACKNAME"))
                  :env :integration}
    :production {:database (get-database-config)
                 :kinesis {}
                 :event-consumer (assoc (get-event-consumer-config)
-                                  :app-name "production-scribe")
+                                  :app-name (get-config-value "STACKNAME"))
                 :env :production}})
 
 (defn lookup
