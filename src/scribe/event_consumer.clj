@@ -71,6 +71,7 @@
                        :site_shopper_id (string->uuid (:site-shopper-id attributes))
                        :session_id (string->uuid (:session-id attributes))
                        :promo_id (string->uuid (:promo-id attributes))
+                       :control_group (boolean (:control-group attributes))
                        :data (doto (PGobject.)
                                (.setValue (generate-string attributes))
                                (.setType "json"))}]
@@ -80,6 +81,7 @@
             (process-thankyou! database data))
           (catch org.postgresql.util.PSQLException ex
             ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
+            (log/info "Failed to write event " the-event)
             (if (= (.getErrorCode ex) 23505)
               (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))
               (throw ex))))))))
