@@ -34,6 +34,12 @@
              :promo_redemptions
              the-pr))
 
+(defn- insert-offer-qualification!
+  [database the-oq]
+  (j/insert! (:connection-pool database)
+             :offer_qualifications
+             the-oq))
+
 (defn- process-thankyou!
   "If it's a thankyou event, we need to do some additional processing"
   [database {:keys [message-id event-name attributes] :as data}]
@@ -59,6 +65,19 @@
                                    :session_id (string->uuid session-id)
                                    :control_group (boolean control-group)})))))
 
+(defn- process-shopper-qualified-offers!
+  [database {:keys [message-id event-name attributes] :as data}]
+  (let [{:keys [site-id shopper-id site-shopper-id offer-ids
+                session-id control-group]} attributes]
+    (when (seq offer-ids)
+      (doseq [oid offer-ids]
+        (insert-offer-qualification! database {:event_id message-id
+                                               :site_id (string->uuid site-id)
+                                               :site_shopper_id (string->uuid site-shopper-id)
+                                               :shopper_id (string->uuid shopper-id)
+                                               :session_id (string->uuid session-id)
+                                               :offer_id (string->uuid oid)})))))
+
 (defn process-message!
   [database {:keys [data sequence-number partition-key] :as message}]
   (log/trace message)
@@ -77,8 +96,10 @@
                                (.setType "json"))}]
         (try
           (insert-event! database the-event)
-          (when (= event-name :thankyou)
-            (process-thankyou! database data))
+          (condp = event-name
+            :thankyou (process-thankyou! database data)
+            :shopper-qualified-offers (process-shopper-qualified-offers! database data)
+            nil)
           (catch org.postgresql.util.PSQLException ex
             ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
             (log/info "Failed to write event " the-event)
