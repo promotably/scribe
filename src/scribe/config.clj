@@ -44,7 +44,7 @@
                            :host "localhost"
                            :port 5432}
                 :kinesis {:aws-credentials-profile "promotably"}
-                :event-consumer {:stream-name "dev-PromotablyAPIEvents"
+                :event-consumer {:stream-name (get-config-value "KINESIS_A" "dev-PromotablyAPIEvents")
                                  :app-name (str "dev-scribe-" (System/getProperty "user.name"))}
                 :env :dev}
    :test       {:database {:db "promotably_test"
@@ -53,7 +53,7 @@
                            :host "localhost"
                            :port 5432}
                 :kinesis  {:aws-credentials-profile "promotably"}
-                :event-consumer {:stream-name "dev-PromotablyAPIEvents"
+                :event-consumer {:stream-name (get-config-value "KINESIS_A" "dev-PromotablyAPIEvents")
                                  :app-name "test-scribe"}
                 :env :test}
    :staging    {:database (get-database-config)
