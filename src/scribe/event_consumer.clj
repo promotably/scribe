@@ -1,10 +1,12 @@
 (ns scribe.event-consumer
-  (:require [amazonica.aws.kinesis :as k]
-            [cheshire.core :refer [generate-string]]
-            [clojure.java.jdbc :as j]
-            [clojure.tools.logging :as log]
-            [cognitect.transit :as transit]
-            [com.stuartsierra.component :as comp])
+  (:require
+   [clojure.string :refer [upper-case]]
+   [amazonica.aws.kinesis :as k]
+   [cheshire.core :refer [generate-string]]
+   [clojure.java.jdbc :as j]
+   [clojure.tools.logging :as log]
+   [cognitect.transit :as transit]
+   [com.stuartsierra.component :as comp])
   (:import [java.math BigDecimal]
            [java.nio ByteBuffer]
            [java.io ByteArrayInputStream]
@@ -52,12 +54,12 @@
                                             join sites s on p.site_id=s.id
                                             where s.site_id=? and p.code=?"
                                site-uuid
-                               (:code c)]))]
+                               (-> c :code upper-case)]))]
         (insert-promo-redemption! database
                                   {:event_id message-id
                                    :site_id site-uuid
                                    :order_id order-id
-                                   :promo_code (:code c)
+                                   :promo_code (-> c :code upper-case)
                                    :promo_id (when p (:id p))
                                    :discount (BigDecimal. (:discount c))
                                    :shopper_id (string->uuid shopper-id)
