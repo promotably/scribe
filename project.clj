@@ -22,6 +22,7 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.nrepl "0.2.6"]
                  [org.clojure/tools.cli "0.3.1"]
+                 [org.clojars.promotably/proggly "0.1.8"]
                  [postgresql "9.3-1102.jdbc4"]
                  [org.apache.commons/commons-daemon "1.0.9"]
                  [cheshire "5.4.0"]]

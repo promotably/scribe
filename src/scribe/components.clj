@@ -9,7 +9,8 @@
             [scribe.event-consumer :as ec])
   (:import [com.mchange.v2.c3p0 ComboPooledDataSource]
            [com.amazonaws.auth.profile ProfileCredentialsProvider]
-           [com.amazonaws.auth DefaultAWSCredentialsProviderChain]))
+           [com.amazonaws.auth DefaultAWSCredentialsProviderChain]
+           [org.apache.log4j Logger Level]))
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -20,11 +21,28 @@
 (defrecord LoggingComponent [config]
   comp/Lifecycle
   (start [this]
-    (log-config/set-logger!
-     "scribe"
-     :name (-> config :logging :name)
-     :level (-> config :logging :level)
-     :out (-> config :logging :out))
+    (if-let [loggly-url (-> config :logging :loggly-url)]
+      (do (log-config/set-loggers!
+           "scribe"
+           (-> config :logging :base))
+          (let [^Logger scribe-logger (log-config/as-logger "scribe")
+                loggly-appender (doto (org.apache.log4j.AsyncAppender.)
+                                  (.setName "async")
+                                  (.setLayout (doto (org.apache.log4j.PatternLayout.)
+                                                (.setConversionPattern "%d{HH:mm:ss} %-5p %22.22t %-22.22c{2} %m%n")))
+                                  (.setBlocking false)
+                                  (.setBufferSize (int 500))
+                                  (.addAppender (doto (com.promotably.proggly.LogglyAppender.)
+                                                  (.setName "loggly")
+                                                  (.setLayout (doto (org.apache.log4j.PatternLayout.)
+                                                                (.setConversionPattern "%d{HH:mm:ss} %-5p %22.22t %-22.22c{2} %m%n")))
+                                                  (.logglyURL loggly-url))))]
+            (doto scribe-logger
+              (.addAppender loggly-appender))
+            (log/info "Loggly appender is attached?" (.isAttached scribe-logger loggly-appender))))
+      (log-config/set-loggers!
+       "scribe"
+       (-> config :logging :base)))
     (log/logf :info "Environment is %s" (-> config :env))
     this)
   (stop [this]
@@ -117,4 +135,3 @@
    :database (comp/using (map->Database {}) [:config :logging])
    :kinesis  (comp/using (map->Kinesis {}) [:config :logging])
    :app      (comp/using (ec/map->EventConsumer {}) [:config :database :kinesis])))
-
