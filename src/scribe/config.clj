@@ -20,7 +20,7 @@
      :out (org.apache.log4j.DailyRollingFileAppender.
            (org.apache.log4j.PatternLayout.
             "%d{HH:mm:ss} %-5p %22.22t %-22.22c{2} %m%n")
-           (str log-dir "/pr-api.log")
+           (str log-dir "/scribe.log")
            "'.'yyyy-MM-dd-HH")}
     {:name "console"
      :level :info
