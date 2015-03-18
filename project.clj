@@ -27,5 +27,5 @@
                  [postgresql "9.3-1102.jdbc4"]
                  [org.apache.commons/commons-daemon "1.0.9"]
                  [cheshire "5.4.0"]]
-  :main scribe.core
-  :repositories {"local" "file:repo"})
+  :aot [scribe.connection-customizer]
+  :main scribe.core)

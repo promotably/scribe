@@ -86,7 +86,8 @@
                  ;; expire excess connections after 30 minutes of inactivity:
                  (.setMaxIdleTimeExcessConnections (* 30 60))
                  ;; expire connections after 3 hours of inactivity:
-                 (.setMaxIdleTime (* 3 60 60)))]
+                 (.setMaxIdleTime (* 3 60 60))
+                 (.setConnectionCustomizerClassName "com.promotably.scribe.ConnectionCustomizer"))]
       (log/infof "Starting database component %s %s" host port)
       (assoc component :connection-pool {:datasource cpds})))
   (stop [component]
