@@ -15,7 +15,7 @@
 ;; Setup info for logging
 (defn base-log-config []
   (if-let [log-dir (get-config-value "LOG_DIR")]
-    (let [log-file (get-config-value "LOG_FILE" (str log-dir "/scribe.log"))]
+    (let [log-file (str log-dir "/scribe.log")]
       {:name "file"
        :level :info
        :out (org.apache.log4j.DailyRollingFileAppender.
@@ -29,8 +29,7 @@
             "%d{HH:mm:ss} %-5p %22.22t %-22.22c{2} %m%n"))}))
 
 (defn loggly-url []
-  (or (get-config-value "LOGGLY_URL")
-      "http://logs-01.loggly.com/inputs/2032adee-6213-469d-ba58-74993611570a/tag/dev,scribe/"))
+  (get-config-value "LOGGLY_URL" "http://logs-01.loggly.com/inputs/2032adee-6213-469d-ba58-74993611570a/tag/dev,scribe/"))
 
 (defn- get-database-config
   "Checks environment variables for database config settings. These
@@ -67,7 +66,7 @@
                 :event-consumer {:stream-name (get-config-value "KINESIS_A" "dev-PromotablyAPIEvents")
                                  :app-name (str "dev-scribe-" (System/getProperty "user.name"))}
                 :logging {:base (base-log-config)
-                          :loggy-url (loggly-url)}
+                          :loggly-url (loggly-url)}
                 :env :dev}
    :test       {:database {:db "promotably_test"
                            :user "p_user"
@@ -78,28 +77,28 @@
                 :event-consumer {:stream-name (get-config-value "KINESIS_A" "dev-PromotablyAPIEvents")
                                  :app-name "test-scribe"}
                 :logging {:base (base-log-config)
-                          :loggy-url (loggly-url)}
+                          :loggly-url (loggly-url)}
                 :env :test}
    :staging    {:database (get-database-config)
                 :kinesis {}
                 :event-consumer (assoc (get-event-consumer-config)
                                   :app-name (get-config-value "STACKNAME"))
                 :logging {:base (base-log-config)
-                          :loggy-url (loggly-url)}
+                          :loggly-url (loggly-url)}
                 :env :staging}
    :integration {:database (get-database-config)
                  :kinesis {}
                  :event-consumer (assoc (get-event-consumer-config)
                                    :app-name (get-config-value "STACKNAME"))
                  :logging {:base (base-log-config)
-                           :loggy-url (loggly-url)}
+                           :loggly-url (loggly-url)}
                  :env :integration}
    :production {:database (get-database-config)
                 :kinesis {}
                 :event-consumer (assoc (get-event-consumer-config)
                                   :app-name (get-config-value "STACKNAME"))
                 :logging {:base (base-log-config)
-                          :loggy-url (loggly-url)}
+                          :loggly-url (loggly-url)}
                 :env :production}})
 
 (defn lookup
