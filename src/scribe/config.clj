@@ -4,7 +4,7 @@
   (:require [com.stuartsierra.component :as component]))
 
 ;; File-based config data
-(def configfile-data {})
+(def ^:dynamic configfile-data {})
 
 (defn- get-config-value
   [key & [default]]
@@ -15,12 +15,13 @@
 ;; Setup info for logging
 (defn base-log-config []
   (if-let [log-dir (get-config-value "LOG_DIR")]
-    {:name "file"
-     :level :info
-     :out (org.apache.log4j.DailyRollingFileAppender.
-           (net.logstash.log4j.JSONEventLayoutV1.)
-           (str log-dir "/scribe.log")
-           "'.'yyyy-MM-dd-HH")}
+    (let [log-file (get-config-value "LOG_FILE" (str log-dir "/scribe.log"))]
+      {:name "file"
+       :level :info
+       :out (org.apache.log4j.DailyRollingFileAppender.
+             (net.logstash.log4j.JSONEventLayoutV1.)
+             log-file
+             "'.'yyyy-MM-dd-HH")})
     {:name "console"
      :level :info
      :out (org.apache.log4j.ConsoleAppender.
@@ -115,8 +116,9 @@
 (defrecord Config [config-file]
   component/Lifecycle
   (start [component]
-    (if config-file
-      (alter-var-root #'configfile-data (-> config-file slurp read-string constantly)))
+    (when config-file
+      (let [data (-> config-file slurp read-string)]
+        (alter-var-root #'configfile-data (constantly data))))
     (let [m (lookup)]
       (if ((:env m) #{:production :integration})
         (alter-var-root #'*warn-on-reflection* (constantly false))
