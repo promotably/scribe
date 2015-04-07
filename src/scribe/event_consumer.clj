@@ -6,6 +6,7 @@
    [clojure.java.jdbc :as j]
    [clojure.tools.logging :as log]
    [cognitect.transit :as transit]
+   [scribe.system :refer :all]
    [com.stuartsierra.component :as comp])
   (:import [java.math BigDecimal]
            [java.nio ByteBuffer]
@@ -49,12 +50,13 @@
                 session-id control-group]} attributes]
     (doseq [c applied-coupons]
       (let [site-uuid (string->uuid site-id)
+            promo-uuid (-> c :promo-uuid)
             p (first (j/query (:connection-pool database)
                               ["select p.id from promos p
                                             join sites s on p.site_id=s.id
-                                            where s.site_id=? and p.code=?"
+                                            where s.site_id=? and p.uuid=?"
                                site-uuid
-                               (-> c :code upper-case)]))]
+                               promo-uuid]))]
         (insert-promo-redemption! database
                                   {:event_id message-id
                                    :site_id site-uuid
@@ -98,6 +100,8 @@
                                (.setType "json"))}]
         (try
           (insert-event! database the-event)
+          (when (-> current-system :config :debug)
+            (log/info event-name))
           (condp = event-name
             :thankyou (process-thankyou! database data)
             :shopper-qualified-offers (process-shopper-qualified-offers! database data)
