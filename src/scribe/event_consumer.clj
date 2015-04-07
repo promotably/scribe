@@ -51,18 +51,19 @@
     (doseq [c applied-coupons]
       (let [site-uuid (string->uuid site-id)
             promo-uuid (-> c :promo-uuid)
-            p (first (j/query (:connection-pool database)
-                              ["select p.id from promos p
+            p (if promo-uuid
+                (first (j/query (:connection-pool database)
+                                ["select p.id from promos p
                                             join sites s on p.site_id=s.id
                                             where s.site_id=? and p.uuid=?"
-                               site-uuid
-                               promo-uuid]))]
+                                 site-uuid
+                                 promo-uuid])))]
         (insert-promo-redemption! database
                                   {:event_id message-id
                                    :site_id site-uuid
                                    :order_id order-id
                                    :promo_code (-> c :code upper-case)
-                                   :promo_id (when p (:id p))
+                                   :promo_id (if p (:id p))
                                    :discount (BigDecimal. (:discount c))
                                    :shopper_id (string->uuid shopper-id)
                                    :site_shopper_id (string->uuid site-shopper-id)
