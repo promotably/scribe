@@ -12,6 +12,12 @@
       (System/getProperty key)
       (get configfile-data key default)))
 
+(defn- get-cloudwatch-config
+  []
+  {:aws-credential-profile (get-config-value "CRED_PROFILE" nil)
+   :delay-minutes 1
+   :interval-minutes 1})
+
 ;; Setup info for logging
 (defn base-log-config []
   (if-let [log-dir (get-config-value "LOG_DIR")]
@@ -63,6 +69,9 @@
                            :host "localhost"
                            :port 5432}
                 :kinesis {:aws-credentials-profile "promotably"}
+                :cloudwatch {:aws-credential-profile "promotably"
+                             :delay-minutes 1
+                             :interval-minutes 1}
                 :event-consumer {:stream-name (get-config-value "KINESIS_A" "dev-PromotablyAPIEvents")
                                  :app-name (str "dev-scribe-" (System/getProperty "user.name"))}
                 :logging {:base (base-log-config)
@@ -74,6 +83,9 @@
                            :host "localhost"
                            :port 5432}
                 :kinesis  {:aws-credentials-profile "promotably"}
+                :cloudwatch {:aws-credential-profile "promotably"
+                             :delay-minutes 1
+                             :interval-minutes 1}
                 :event-consumer {:stream-name (get-config-value "KINESIS_A" "dev-PromotablyAPIEvents")
                                  :app-name "test-scribe"}
                 :logging {:base (base-log-config)
@@ -81,6 +93,7 @@
                 :env :test}
    :staging    {:database (get-database-config)
                 :kinesis {}
+                :cloudwatch (get-cloudwatch-config)
                 :event-consumer (assoc (get-event-consumer-config)
                                   :app-name (get-config-value "STACKNAME"))
                 :logging {:base (base-log-config)
@@ -88,6 +101,7 @@
                 :env :staging}
    :integration {:database (get-database-config)
                  :kinesis {}
+                 :cloudwatch (get-cloudwatch-config)
                  :event-consumer (assoc (get-event-consumer-config)
                                    :app-name (get-config-value "STACKNAME"))
                  :logging {:base (base-log-config)
@@ -95,6 +109,7 @@
                  :env :integration}
    :production {:database (get-database-config)
                 :kinesis {}
+                :cloudwatch (get-cloudwatch-config)
                 :event-consumer (assoc (get-event-consumer-config)
                                   :app-name (get-config-value "STACKNAME"))
                 :logging {:base (base-log-config)

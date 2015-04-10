@@ -26,6 +26,7 @@
                  [org.clojars.promotably/proggly "0.1.8"]
                  [postgresql "9.3-1102.jdbc4"]
                  [org.apache.commons/commons-daemon "1.0.9"]
-                 [cheshire "5.4.0"]]
+                 [cheshire "5.4.0"]
+                 [org.clojars.promotably/apollo "0.2.0"]]
   :aot [scribe.connection-customizer]
   :main scribe.core)

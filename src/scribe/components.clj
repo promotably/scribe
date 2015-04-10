@@ -6,7 +6,8 @@
             [clj-logging-config.log4j :as log-config]
             [com.stuartsierra.component :as comp]
             [scribe.config :as config]
-            [scribe.event-consumer :as ec])
+            [scribe.event-consumer :as ec]
+            [apollo.core :as apollo])
   (:import [com.mchange.v2.c3p0 ComboPooledDataSource]
            [com.amazonaws.auth.profile ProfileCredentialsProvider]
            [com.amazonaws.auth DefaultAWSCredentialsProviderChain]
@@ -121,6 +122,30 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
+;; AWS Cloudwatch Component
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defrecord Cloudwatch [config client scheduler recorder]
+  comp/Lifecycle
+  (start [this]
+    (let [{:keys [aws-credential-profile delay-minutes interval-minutes]} (:cloudwatch config)
+          c (apollo/create-async-cw-client :provider (ProfileCredentialsProvider. aws-credential-profile))
+          s (apollo/create-vacuum-scheduler)
+          recorder-namespace (str "scribe-" (name (:env config)))]
+      (log/infof "Cloudwatch is starting with credential profile '%s'." aws-credential-profile)
+      (apollo/start-vacuum-scheduler! delay-minutes interval-minutes s c)
+      (log/infof "Cloudwatch Recording Namespace: %s" recorder-namespace)
+      (-> this
+          (assoc :client c)
+          (assoc :scheduler s)
+          (assoc :recorder (apollo/get-context-recorder recorder-namespace {})))))
+  (stop [this]
+    (log/info "Cloudwatch is stopping")
+    (apollo/stop-vacuum-scheduler! (:scheduler this))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
 ;; High Level Application System
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -128,9 +153,10 @@
 (defn system
   [{:keys [config-file port repl-port] :as options}]
   (comp/system-map
-   :config   (comp/using (config/map->Config options) [])
-   :logging  (comp/using (map->LoggingComponent {}) [:config])
-   :cider    (comp/using (map->ReplComponent {:port repl-port}) [:config :logging])
-   :database (comp/using (map->Database {}) [:config :logging])
-   :kinesis  (comp/using (map->Kinesis {}) [:config :logging])
-   :app      (comp/using (ec/map->EventConsumer {}) [:config :database :kinesis])))
+   :config     (comp/using (config/map->Config options) [])
+   :logging    (comp/using (map->LoggingComponent {}) [:config])
+   :cider      (comp/using (map->ReplComponent {:port repl-port}) [:config :logging])
+   :database   (comp/using (map->Database {}) [:config :logging])
+   :kinesis    (comp/using (map->Kinesis {}) [:config :logging])
+   :cloudwatch (comp/using (map->Cloudwatch {}) [:config :logging])
+   :app        (comp/using (ec/map->EventConsumer {}) [:config :database :kinesis :cloudwatch])))
