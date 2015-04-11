@@ -55,7 +55,6 @@
                                             where s.site_id=? and p.code=?"
                                site-uuid
                                (-> c :code upper-case)]))]
-        (cloudwatch-recorder "promo-redemption-inserted" 1 :Count)
         (insert-promo-redemption! database
                                   {:event_id message-id
                                    :site_id site-uuid
@@ -66,7 +65,8 @@
                                    :shopper_id (string->uuid shopper-id)
                                    :site_shopper_id (string->uuid site-shopper-id)
                                    :session_id (string->uuid session-id)
-                                   :control_group (boolean control-group)})))))
+                                   :control_group (boolean control-group)})
+        (cloudwatch-recorder "promo-redemption-inserted" 1 :Count)))))
 
 (defn- process-shopper-qualified-offers!
   [database cloudwatch-recorder {:keys [message-id event-name attributes] :as data}]
@@ -74,13 +74,13 @@
                 session-id control-group]} attributes]
     (when (seq offer-ids)
       (doseq [oid offer-ids]
-        (cloudwatch-recorder "offer-qualification-inserted" 1 :Count)
         (insert-offer-qualification! database {:event_id message-id
                                                :site_id (string->uuid site-id)
                                                :site_shopper_id (string->uuid site-shopper-id)
                                                :shopper_id (string->uuid shopper-id)
                                                :session_id (string->uuid session-id)
-                                               :offer_id (string->uuid oid)})))))
+                                               :offer_id (string->uuid oid)})
+        (cloudwatch-recorder "offer-qualification-inserted" 1 :Count)))))
 
 (defn process-message!
   [database cloudwatch-recorder {:keys [data sequence-number partition-key] :as message}]
@@ -100,8 +100,8 @@
                                (.setValue (generate-string attributes))
                                (.setType "json"))}]
         (try
-          (cloudwatch-recorder (str (name event-name) "-event-inserted") 1 :Count)
           (insert-event! database the-event)
+          (cloudwatch-recorder (str (name event-name) "-event-inserted") 1 :Count)
           (condp = event-name
             :thankyou (process-thankyou! database cloudwatch-recorder data)
             :shopper-qualified-offers (process-shopper-qualified-offers! database cloudwatch-recorder data)
