@@ -23,7 +23,7 @@
 
 (defn- insert-event!
   "Attempts to insert to the events table."
-  [database cloudwatch-recorder the-event]
+  [database the-event]
   (j/insert! (:connection-pool database)
              :events
              the-event))
@@ -31,13 +31,13 @@
 (defn- insert-promo-redemption!
   "Attempts to insert to the promo_redemptions table. If a duplicate (by event_id) is inserted,
    the exception is caught. Any other exceptions are re-thrown"
-  [database cloudwatch-recorder the-pr]
+  [database the-pr]
   (j/insert! (:connection-pool database)
              :promo_redemptions
              the-pr))
 
 (defn- insert-offer-qualification!
-  [database cloudwatch-recorder the-oq]
+  [database the-oq]
   (j/insert! (:connection-pool database)
              :offer_qualifications
              the-oq))
@@ -55,8 +55,8 @@
                                             where s.site_id=? and p.code=?"
                                site-uuid
                                (-> c :code upper-case)]))]
+        (cloudwatch-recorder "promo-redemption-inserted" 1 :Count)
         (insert-promo-redemption! database
-                                  cloudwatch-recorder
                                   {:event_id message-id
                                    :site_id site-uuid
                                    :order_id order-id
@@ -74,12 +74,13 @@
                 session-id control-group]} attributes]
     (when (seq offer-ids)
       (doseq [oid offer-ids]
-        (insert-offer-qualification! database cloudwatch-recorder {:event_id message-id
-                                                          :site_id (string->uuid site-id)
-                                                          :site_shopper_id (string->uuid site-shopper-id)
-                                                          :shopper_id (string->uuid shopper-id)
-                                                          :session_id (string->uuid session-id)
-                                                          :offer_id (string->uuid oid)})))))
+        (cloudwatch-recorder "offer-qualification-inserted" 1 :Count)
+        (insert-offer-qualification! database {:event_id message-id
+                                               :site_id (string->uuid site-id)
+                                               :site_shopper_id (string->uuid site-shopper-id)
+                                               :shopper_id (string->uuid shopper-id)
+                                               :session_id (string->uuid session-id)
+                                               :offer_id (string->uuid oid)})))))
 
 (defn process-message!
   [database cloudwatch-recorder {:keys [data sequence-number partition-key] :as message}]
@@ -100,7 +101,7 @@
                                (.setType "json"))}]
         (try
           (cloudwatch-recorder (str (name event-name) "-event-inserted") 1 :Count)
-          (insert-event! database cloudwatch-recorder the-event)
+          (insert-event! database the-event)
           (condp = event-name
             :thankyou (process-thankyou! database cloudwatch-recorder data)
             :shopper-qualified-offers (process-shopper-qualified-offers! database cloudwatch-recorder data)
@@ -108,6 +109,7 @@
           (catch org.postgresql.util.PSQLException ex
             ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
             (log/info "Failed to write event " the-event)
+            (cloudwatch-recorder (str (name event-name) "-event-failure") 1 :Count)
             (if (= (.getErrorCode ex) 23505)
               (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))
               (throw ex))))))))
