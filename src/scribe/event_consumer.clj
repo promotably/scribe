@@ -23,7 +23,7 @@
 
 (defn- insert-event!
   "Attempts to insert to the events table."
-  [database cloudwatch the-event]
+  [database cloudwatch-recorder the-event]
   (j/insert! (:connection-pool database)
              :events
              the-event))
@@ -31,20 +31,20 @@
 (defn- insert-promo-redemption!
   "Attempts to insert to the promo_redemptions table. If a duplicate (by event_id) is inserted,
    the exception is caught. Any other exceptions are re-thrown"
-  [database cloudwatch the-pr]
+  [database cloudwatch-recorder the-pr]
   (j/insert! (:connection-pool database)
              :promo_redemptions
              the-pr))
 
 (defn- insert-offer-qualification!
-  [database cloudwatch the-oq]
+  [database cloudwatch-recorder the-oq]
   (j/insert! (:connection-pool database)
              :offer_qualifications
              the-oq))
 
 (defn- process-thankyou!
   "If it's a thankyou event, we need to do some additional processing"
-  [database cloudwatch {:keys [message-id event-name attributes] :as data}]
+  [database cloudwatch-recorder {:keys [message-id event-name attributes] :as data}]
   (let [{:keys [applied-coupons site-id order-id shopper-id site-shopper-id
                 session-id control-group]} attributes]
     (doseq [c applied-coupons]
@@ -56,7 +56,7 @@
                                site-uuid
                                (-> c :code upper-case)]))]
         (insert-promo-redemption! database
-                                  cloudwatch
+                                  cloudwatch-recorder
                                   {:event_id message-id
                                    :site_id site-uuid
                                    :order_id order-id
@@ -69,12 +69,12 @@
                                    :control_group (boolean control-group)})))))
 
 (defn- process-shopper-qualified-offers!
-  [database cloudwatch {:keys [message-id event-name attributes] :as data}]
+  [database cloudwatch-recorder {:keys [message-id event-name attributes] :as data}]
   (let [{:keys [site-id shopper-id site-shopper-id offer-ids
                 session-id control-group]} attributes]
     (when (seq offer-ids)
       (doseq [oid offer-ids]
-        (insert-offer-qualification! database cloudwatch {:event_id message-id
+        (insert-offer-qualification! database cloudwatch-recorder {:event_id message-id
                                                           :site_id (string->uuid site-id)
                                                           :site_shopper_id (string->uuid site-shopper-id)
                                                           :shopper_id (string->uuid shopper-id)
@@ -82,8 +82,9 @@
                                                           :offer_id (string->uuid oid)})))))
 
 (defn process-message!
-  [database cloudwatch {:keys [data sequence-number partition-key] :as message}]
+  [database cloudwatch-recorder {:keys [data sequence-number partition-key] :as message}]
   (log/trace message)
+  (cloudwatch-recorder "event-received" 1 :Count)
   (try
     (let [{:keys [message-id event-name attributes]} data]
       (let [the-event {:event_id message-id
@@ -98,10 +99,11 @@
                                (.setValue (generate-string attributes))
                                (.setType "json"))}]
         (try
-          (insert-event! database cloudwatch the-event)
+          (cloudwatch-recorder (str (name event-name) "-event-inserted") 1 :Count)
+          (insert-event! database cloudwatch-recorder the-event)
           (condp = event-name
-            :thankyou (process-thankyou! database cloudwatch data)
-            :shopper-qualified-offers (process-shopper-qualified-offers! database cloudwatch data)
+            :thankyou (process-thankyou! database cloudwatch-recorder data)
+            :shopper-qualified-offers (process-shopper-qualified-offers! database cloudwatch-recorder data)
             nil)
           (catch org.postgresql.util.PSQLException ex
             ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
@@ -130,7 +132,8 @@
   comp/Lifecycle
   (start [component]
     (log/info "Starting Event Consumer")
-    (let [w (first (k/worker :credentials (:credentials kinesis)
+    (let [cloudwatch-recorder (:recorder cloudwatch)
+          w (first (k/worker :credentials (:credentials kinesis)
                              :app (get-in config [:event-consumer :app-name])
                              :stream (get-in config [:event-consumer :stream-name])
                              :deserializer deserialize
@@ -139,7 +142,7 @@
                                           (log/debugf "Processing %d messages"
                                                      (count messages))
                                           (doseq [msg messages]
-                                            (process-message! database cloudwatch msg)))))
+                                            (process-message! database cloudwatch-recorder msg)))))
           wid @(future (.run w))]
       (log/info "Event Consumer Worker Started With ID %s" wid)
       (merge component {:worker w
