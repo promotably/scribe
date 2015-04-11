@@ -114,7 +114,7 @@
           (catch org.postgresql.util.PSQLException ex
             ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
             (log/info "Failed to write event " the-event)
-            (cloudwatch-recorder (str (name event-name) "-event-failure") 1 :Count)
+            (cloudwatch-recorder "event-insert-failed" 1 :Count)
             (if (= (.getErrorCode ex) 23505)
               (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))
               (throw ex))))))))
