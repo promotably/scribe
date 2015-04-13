@@ -7,6 +7,7 @@
             [com.stuartsierra.component :as comp]
             [scribe.config :as config]
             [scribe.event-consumer :as ec]
+            [org.httpkit.server :as http-kit]
             [apollo.core :as apollo])
   (:import [com.mchange.v2.c3p0 ComboPooledDataSource]
            [com.amazonaws.auth.profile ProfileCredentialsProvider]
@@ -144,6 +145,33 @@
     (log/info "Cloudwatch is stopping")
     (apollo/stop-vacuum-scheduler! (:scheduler this))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Server component
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn app [req]
+  {:status  200
+   :headers {"Content-Type" "text/html"}
+   :body    "OK"})
+
+(defrecord Server [port config logging]
+  comp/Lifecycle
+  (start
+    [component]
+    (if (:stop! component)
+      component
+      (let [server (http-kit/run-server app {:port (or port 0)})
+            port (-> server meta :local-port)]
+        (log/info "Web server running on port " port)
+        (assoc component :stop! server :port port))))
+  (stop
+    [component]
+    (when-let [stop! (:stop! component)]
+      (stop! :timeout 250))
+    (dissoc component :stop! :port)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; High Level Application System
@@ -159,4 +187,5 @@
    :database   (comp/using (map->Database {}) [:config :logging])
    :kinesis    (comp/using (map->Kinesis {}) [:config :logging])
    :cloudwatch (comp/using (map->Cloudwatch {}) [:config :logging])
-   :app        (comp/using (ec/map->EventConsumer {}) [:config :database :kinesis :cloudwatch])))
+   :server     (comp/using (map->Server {:port (java.lang.Integer. port)}) [:config :logging])
+   :app        (comp/using (ec/map->EventConsumer {}) [:config :database :kinesis :cloudwatch :server])))

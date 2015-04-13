@@ -135,7 +135,7 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defrecord EventConsumer [config kinesis database cloudwatch]
+(defrecord EventConsumer [config kinesis database cloudwatch server]
   comp/Lifecycle
   (start [component]
     (log/info "Starting Event Consumer")
