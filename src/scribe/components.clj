@@ -131,7 +131,9 @@
   comp/Lifecycle
   (start [this]
     (let [{:keys [aws-credential-profile delay-minutes interval-minutes]} (:cloudwatch config)
-          c (apollo/create-async-cw-client :provider (ProfileCredentialsProvider. aws-credential-profile))
+          c (apollo/create-async-cw-client :provider (if-not (empty? aws-credential-profile)
+                                                       (ProfileCredentialsProvider. aws-credential-profile)
+                                                       (DefaultAWSCredentialsProviderChain.)))
           s (apollo/create-vacuum-scheduler)
           recorder-namespace (str "scribe-" (name (:env config)))]
       (log/infof "Cloudwatch is starting with credential profile '%s'." aws-credential-profile)
