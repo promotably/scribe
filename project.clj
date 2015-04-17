@@ -27,7 +27,7 @@
                  [postgresql "9.3-1102.jdbc4"]
                  [org.apache.commons/commons-daemon "1.0.9"]
                  [cheshire "5.4.0"]
-                 [org.clojars.promotably/apollo "0.2.0"]
+                 [org.clojars.promotably/apollo "0.2.4"]
                  [compojure "1.1.9" :exclusions [joda-time]]
                  [http-kit "2.1.18"]]
   :aot [scribe.connection-customizer]
