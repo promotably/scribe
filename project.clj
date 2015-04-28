@@ -29,6 +29,7 @@
                  [cheshire "5.4.0"]
                  [org.clojars.promotably/apollo "0.2.4"]
                  [compojure "1.1.9" :exclusions [joda-time]]
-                 [http-kit "2.1.18"]]
+                 [http-kit "2.1.18"]
+                 [net.sf.uadetector/uadetector-resources "2014.10"]]
   :aot [scribe.connection-customizer]
   :main scribe.core)

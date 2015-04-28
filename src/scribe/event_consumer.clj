@@ -6,6 +6,7 @@
    [clojure.java.jdbc :as j]
    [clojure.tools.logging :as log]
    [cognitect.transit :as transit]
+   [scribe.lib.detector :as detector]
    [scribe.system :refer :all]
    [com.stuartsierra.component :as comp])
   (:import [java.math BigDecimal]
@@ -21,6 +22,10 @@
     java.lang.String (java.util.UUID/fromString s)
     s))
 
+(defn robot?
+  [user-agent-string]
+  (when-let [parsed-user-agent (detector/user-agent user-agent-string)]
+    (= (:type parsed-user-agent) :robot)))
 
 (defn- insert-event!
   "Attempts to insert to the events table."
@@ -90,7 +95,8 @@
   (log/trace message)
   (cloudwatch-recorder "event-received" 1 :Count)
   (try
-    (let [{:keys [message-id event-name attributes]} data]
+    (let [{:keys [message-id event-name attributes]} data
+          user-agent-string (:user-agent attributes)]
       (let [the-event {:event_id message-id
                        :type (name event-name)
                        :site_id (string->uuid (:site-id attributes))
@@ -103,14 +109,20 @@
                                (.setValue (generate-string attributes))
                                (.setType "json"))}]
         (try
-          (insert-event! database the-event)
-          (cloudwatch-recorder (str (name event-name) "-event-inserted") 1 :Count)
-          (when (-> current-system :config :debug)
-            (log/info event-name))
-          (condp = event-name
-            :thankyou (process-thankyou! database cloudwatch-recorder data)
-            :shopper-qualified-offers (process-shopper-qualified-offers! database cloudwatch-recorder data)
-            nil)
+          (if (robot? user-agent-string)
+            (do (cloudwatch-recorder "robot-event-filtered" 1 :Count)
+                (cloudwatch-recorder "robot-event-filtered" 1 :Count :dimensions {:site-id (:site-id attributes)})
+                (cloudwatch-recorder "robot-event-filtered" 1 :Count :dimensions {:site-id (:site-id attributes)
+                                                                                  :type (name event-name)}))
+            (do
+              (insert-event! database the-event)
+              (cloudwatch-recorder (str (name event-name) "-event-inserted") 1 :Count)
+              (when (-> current-system :config :debug)
+                (log/info event-name))
+              (condp = event-name
+                :thankyou (process-thankyou! database cloudwatch-recorder data)
+                :shopper-qualified-offers (process-shopper-qualified-offers! database cloudwatch-recorder data)
+                nil)))
           (catch org.postgresql.util.PSQLException ex
             ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
             (log/info "Failed to write event " the-event)
