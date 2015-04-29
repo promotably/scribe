@@ -111,8 +111,8 @@
         (try
           (if (robot? user-agent-string)
             (do (cloudwatch-recorder "robot-event-filtered" 1 :Count)
-                (cloudwatch-recorder "robot-event-filtered" 1 :Count :dimensions {:site-id (:site-id attributes)})
-                (cloudwatch-recorder "robot-event-filtered" 1 :Count :dimensions {:site-id (:site-id attributes)
+                (cloudwatch-recorder "robot-event-filtered" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
+                (cloudwatch-recorder "robot-event-filtered" 1 :Count :dimensions {:site-id (str (:site-id attributes))
                                                                                   :type (name event-name)}))
             (do
               (insert-event! database the-event)
@@ -127,9 +127,15 @@
             ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
             (log/info "Failed to write event " the-event)
             (cloudwatch-recorder "event-insert-failed" 1 :Count)
+            (cloudwatch-recorder "event-insert-failed" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
             (if (= (.getErrorCode ex) 23505)
               (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))
-              (throw ex))))))))
+              (throw ex)))
+          (catch Exception ex
+            (cloudwatch-recorder "event-insert-failed" 1 :Count)
+            (cloudwatch-recorder "event-insert-failed" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
+            (log/error ex "EXCEPTION WHILE PROCESSING MESSAGE")
+            (throw ex)))))))
 
 
 (defn deserialize
