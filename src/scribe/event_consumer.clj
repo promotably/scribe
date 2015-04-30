@@ -3,6 +3,7 @@
    [clojure.string :refer [upper-case]]
    [amazonica.aws.kinesis :as k]
    [cheshire.core :refer [generate-string]]
+   [clojure.data.json :as json]
    [clojure.java.jdbc :as j]
    [clojure.tools.logging :as log]
    [cognitect.transit :as transit]
@@ -137,15 +138,16 @@
             (log/error ex "EXCEPTION WHILE PROCESSING MESSAGE")
             (throw ex)))))))
 
-
 (defn deserialize
   [^java.nio.ByteBuffer byte-buffer]
   (let [ba (byte-array (.remaining byte-buffer))]
     (.get byte-buffer ba)
     (let [in (ByteArrayInputStream. ba)
-          rdr (transit/reader in :json)
-          d (transit/read rdr)]
-      d)))
+          raw (slurp in)]
+      (if (.startsWith raw "[")
+        (let [rdr (transit/reader in :json)]
+          (transit/read rdr))
+        (-> (json/read-str raw) :msg)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
