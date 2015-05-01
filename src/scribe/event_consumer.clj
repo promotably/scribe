@@ -23,7 +23,7 @@
     java.lang.String (java.util.UUID/fromString s)
     s))
 
-(defn robot?
+(defn- robot?
   [user-agent-string]
   (when-let [parsed-user-agent (detector/user-agent user-agent-string)]
     (= (:type parsed-user-agent) :robot)))
