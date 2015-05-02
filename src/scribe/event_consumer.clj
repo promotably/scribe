@@ -116,7 +116,7 @@
                                                                                   :type (name event-name)}))
             (do
               (insert-event! database the-event)
-              (cloudwatch-recorder (str (name event-name) "-event-inserted") 1 :Count)
+              (cloudwatch-recorder "event-inserted" 1 :Count :dimensions {:type (name event-name)})
               (when (-> current-system :config :debug)
                 (log/info event-name))
               (condp = event-name
