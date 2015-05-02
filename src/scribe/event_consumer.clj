@@ -129,13 +129,11 @@
             (cloudwatch-recorder "event-insert-failed" 1 :Count)
             (cloudwatch-recorder "event-insert-failed" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
             (if (= (.getErrorCode ex) 23505)
-              (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))
-              (throw ex)))
+              (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))))
           (catch Exception ex
             (cloudwatch-recorder "event-insert-failed" 1 :Count)
             (cloudwatch-recorder "event-insert-failed" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
-            (log/error ex "EXCEPTION WHILE PROCESSING MESSAGE")
-            (throw ex)))))))
+            (log/errorf ex "EXCEPTION WHILE PROCESSING MESSAGE %s" (str data))))))))
 
 
 (defn deserialize
