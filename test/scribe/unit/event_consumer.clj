@@ -1,6 +1,11 @@
 (ns scribe.unit.event-consumer
-  (:require [midje.sweet :refer :all]
-            [scribe.event-consumer :refer :all]))
+  (:require [clojure.data.json :as json]
+            [cognitect.transit :as transit]
+            [midje.sweet :refer :all]
+            [scribe.event-consumer :refer :all])
+  (:import [java.nio ByteBuffer CharBuffer]
+           [java.nio.charset Charset CharsetEncoder]
+           [java.io ByteArrayOutputStream]))
 
 (let [site-id (java.util.UUID/randomUUID)
       cw-recorder-args (atom [])
@@ -24,3 +29,19 @@
                                     (just ["robot-event-filtered" 1 :Count
                                            :dimensions (just {:site-id (str site-id)
                                                               :type "product-view"})])])))
+
+(fact "Deserialize branching works"
+      (let [event {:a "A"
+                   :b "B"}
+            event-w-envelope {:msg event}
+            charset (Charset/forName "UTF-8")
+            encoder (.newEncoder charset)
+            raw-bb (.encode encoder (CharBuffer/wrap (json/write-str event-w-envelope)))
+            out-stream (ByteArrayOutputStream.)
+            t-writer (transit/writer out-stream :json)
+            _ (transit/write t-writer event)
+            transit-bb (ByteBuffer/wrap (.toByteArray out-stream))]
+        (deserialize raw-bb) => {:a "A"
+                                 :b "B"}
+        (deserialize transit-bb) => {:a "A"
+                                     :b "B"}))

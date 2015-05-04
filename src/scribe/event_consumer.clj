@@ -143,11 +143,14 @@
   (let [ba (byte-array (.remaining byte-buffer))]
     (.get byte-buffer ba)
     (let [in (ByteArrayInputStream. ba)
-          raw (slurp in)]
+          raw (slurp in)
+          _ (println raw)]
       (if (.startsWith raw "[")
-        (let [rdr (transit/reader in :json)]
+        (let [_ (println "transit")
+              rdr (transit/reader in :json)]
           (transit/read rdr))
-        (-> (json/read-str raw) :msg)))))
+        (do (println "raw")
+            (-> (json/read-str raw) :msg))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
