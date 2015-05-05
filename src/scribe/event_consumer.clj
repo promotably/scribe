@@ -117,7 +117,7 @@
                                                                                   :type (name event-name)}))
             (do
               (insert-event! database the-event)
-              (cloudwatch-recorder (str (name event-name) "-event-inserted") 1 :Count)
+              (cloudwatch-recorder "event-inserted" 1 :Count :dimensions {:type (name event-name)})
               (when (-> current-system :config :debug)
                 (log/info event-name))
               (condp = event-name
@@ -130,13 +130,11 @@
             (cloudwatch-recorder "event-insert-failed" 1 :Count)
             (cloudwatch-recorder "event-insert-failed" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
             (if (= (.getErrorCode ex) 23505)
-              (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))
-              (throw ex)))
+              (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))))
           (catch Exception ex
             (cloudwatch-recorder "event-insert-failed" 1 :Count)
             (cloudwatch-recorder "event-insert-failed" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
-            (log/error ex "EXCEPTION WHILE PROCESSING MESSAGE")
-            (throw ex)))))))
+            (log/errorf ex "EXCEPTION WHILE PROCESSING MESSAGE %s" (str data))))))))
 
 (defn deserialize
   [^java.nio.ByteBuffer byte-buffer]
