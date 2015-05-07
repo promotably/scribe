@@ -35,7 +35,7 @@
             "%d{HH:mm:ss} %-5p %22.22t %-22.22c{2} %m%n"))}))
 
 (defn loggly-url []
-  (get-config-value "LOGGLY_URL" "http://logs-01.loggly.com/inputs/2032adee-6213-469d-ba58-74993611570a/tag/dev,scribe/"))
+  (get-config-value "LOGGLY_URL"))
 
 (defn- get-database-config
   "Checks environment variables for database config settings. These
