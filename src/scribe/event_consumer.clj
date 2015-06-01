@@ -56,7 +56,7 @@
                 session-id control-group]} attributes]
     (doseq [c applied-coupons]
       (let [site-uuid (string->uuid site-id)
-            promo-uuid (-> c :promo-uuid)
+            promo-uuid (-> c :promo-uuid string->uuid)
             p (if promo-uuid
                 (first (j/query (:connection-pool database)
                                 ["select p.id from promos p
@@ -65,7 +65,7 @@
                                  site-uuid
                                  promo-uuid])))]
         (insert-promo-redemption! database
-                                  {:event_id message-id
+                                  {:event_id (string->uuid message-id)
                                    :site_id site-uuid
                                    :order_id order-id
                                    :promo_code (-> c :code upper-case)
@@ -83,7 +83,7 @@
                 session-id control-group]} attributes]
     (when (seq offer-ids)
       (doseq [oid offer-ids]
-        (insert-offer-qualification! database {:event_id message-id
+        (insert-offer-qualification! database {:event_id (string->uuid message-id)
                                                :site_id (string->uuid site-id)
                                                :site_shopper_id (string->uuid site-shopper-id)
                                                :shopper_id (string->uuid shopper-id)
@@ -98,7 +98,7 @@
   (try
     (let [{:keys [message-id event-name attributes]} data
           user-agent-string (:user-agent attributes)]
-      (let [the-event {:event_id message-id
+      (let [the-event {:event_id (string->uuid message-id)
                        :type (name event-name)
                        :site_id (string->uuid (:site-id attributes))
                        :shopper_id (string->uuid (:shopper-id attributes))
