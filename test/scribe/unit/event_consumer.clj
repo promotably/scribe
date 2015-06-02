@@ -31,17 +31,24 @@
                                                               :type "product-view"})])])))
 
 (fact "Deserialize branching works"
-      (let [event {:a "A"
-                   :b "B"}
+      (let [test-id (java.util.UUID/randomUUID)
+            event {:a "A"
+                   :b "B"
+                   :c test-id}
             event-w-envelope {:msg event}
             charset (Charset/forName "UTF-8")
             encoder (.newEncoder charset)
-            raw-bb (.encode encoder (CharBuffer/wrap (json/write-str event-w-envelope)))
+            raw-bb (.encode encoder (CharBuffer/wrap (json/write-str event-w-envelope :value-fn (fn [k v]
+                                                                                                  (if (instance? java.util.UUID v)
+                                                                                                    (str v)
+                                                                                                    v)))))
             out-stream (ByteArrayOutputStream.)
             t-writer (transit/writer out-stream :json)
             _ (transit/write t-writer event)
             transit-bb (ByteBuffer/wrap (.toByteArray out-stream))]
         (deserialize raw-bb) => {:a "A"
-                                 :b "B"}
+                                 :b "B"
+                                 :c test-id}
         (deserialize transit-bb) => {:a "A"
-                                     :b "B"}))
+                                     :b "B"
+                                     :c test-id}))

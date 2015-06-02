@@ -146,7 +146,19 @@
       (if (.startsWith raw "[")
         (let [rdr (transit/reader in* :json)]
           (transit/read rdr))
-        (-> (json/read-str raw :key-fn keyword) :msg)))))
+        (-> (json/read-str raw :key-fn keyword :value-fn (fn [k v]
+                                                           (if (and (coll? v)
+                                                                    (not (map? v)))
+                                                             (map (fn [cv]
+                                                                    (if (and (string? cv)
+                                                                             (re-matches #"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" cv))
+                                                                      (java.util.UUID/fromString cv)
+                                                                      cv)) v)
+                                                             (if (and (string? v)
+                                                                      (re-matches #"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" v))
+                                                               (java.util.UUID/fromString v)
+                                                               v))))
+            :msg)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
