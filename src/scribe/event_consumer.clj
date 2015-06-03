@@ -120,7 +120,9 @@
   (cloudwatch-recorder "event-received" 1 :Count)
   (try
     (let [{:keys [message-id event-name attributes]} data
-          user-agent-string (get-in attributes [:request-headers "user-agent"])]
+          user-agent-string (or
+                             (get-in attributes [:user-agent])
+                             (get-in attributes [:request-headers "user-agent"]))]
       (let [the-event {:event_id (string->uuid message-id)
                        :type (name event-name)
                        :site_id (string->uuid (:site-id attributes))
