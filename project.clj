@@ -17,6 +17,7 @@
                  [com.stuartsierra/component "0.2.2"]
                  [clj-logging-config "1.9.12"]
                  [log4j/log4j "1.2.17"]
+                 [org.slf4j/slf4j-log4j12 "1.7.12"]
                  [net.logstash.log4j/jsonevent-layout "1.7"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/java.jdbc "0.3.6"]

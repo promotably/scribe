@@ -127,11 +127,11 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defrecord Config [config-file]
+(defrecord Config [options]
   component/Lifecycle
   (start [component]
-    (when config-file
-      (let [data (-> config-file slurp read-string)]
+    (when (:config-file options)
+      (let [data (-> options :config-file slurp read-string)]
         (alter-var-root #'configfile-data (constantly data))))
     (let [m (lookup)]
       (if ((:env m) #{:production :integration})

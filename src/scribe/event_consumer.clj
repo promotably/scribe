@@ -25,8 +25,9 @@
 
 (defn- robot?
   [user-agent-string]
-  (when-let [parsed-user-agent (detector/user-agent user-agent-string)]
-    (= (:type parsed-user-agent) :robot)))
+  (if user-agent-string
+    (when-let [parsed-user-agent (detector/user-agent user-agent-string)]
+      (= (:type parsed-user-agent) :robot))))
 
 (defn- insert-event!
   "Attempts to insert to the events table."
@@ -34,6 +35,13 @@
   (j/insert! (:connection-pool database)
              :events
              the-event))
+
+(defn- insert-visit-source!
+  "Attempts to insert to the visit_sources table."
+  [database the-vs]
+  (j/insert! (:connection-pool database)
+             :visit_sources
+             the-vs))
 
 (defn- insert-promo-redemption!
   "Attempts to insert to the promo_redemptions table. If a duplicate (by event_id) is inserted,
@@ -48,6 +56,21 @@
   (j/insert! (:connection-pool database)
              :offer_qualifications
              the-oq))
+
+(defn process-sources!
+  "If it's an event which might have a sources key, we need to do some additional processing"
+  [database cloudwatch-recorder {:keys [message-id event-name attributes] :as data}]
+  (let [{:keys [site-id site-shopper-id session-id source]} attributes]
+    (when source
+      (insert-visit-source! database
+                            {:site_id (string->uuid site-id)
+                             :site_shopper_id (string->uuid site-shopper-id)
+                             :session_id (string->uuid session-id)
+                             :data (doto (PGobject.)
+                                     (.setValue (generate-string (:data source)))
+                                     (.setType "json"))
+                             :source_category (-> source :category name)})
+      (cloudwatch-recorder "visit-source-inserted" 1 :Count))))
 
 (defn- process-thankyou!
   "If it's a thankyou event, we need to do some additional processing"
@@ -97,7 +120,7 @@
   (cloudwatch-recorder "event-received" 1 :Count)
   (try
     (let [{:keys [message-id event-name attributes]} data
-          user-agent-string (:user-agent attributes)]
+          user-agent-string (get-in attributes [:request-headers "user-agent"])]
       (let [the-event {:event_id (string->uuid message-id)
                        :type (name event-name)
                        :site_id (string->uuid (:site-id attributes))
@@ -109,36 +132,50 @@
                        :data (doto (PGobject.)
                                (.setValue (generate-string attributes))
                                (.setType "json"))}]
+
         (try
           (if (robot? user-agent-string)
-            (do (cloudwatch-recorder "robot-event-filtered" 1 :Count)
-                (cloudwatch-recorder "robot-event-filtered" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
-                (cloudwatch-recorder "robot-event-filtered" 1 :Count :dimensions {:site-id (str (:site-id attributes))
-                                                                                  :type (name event-name)}))
+            (do
+              (cloudwatch-recorder "robot-event-filtered" 1 :Count)
+              (cloudwatch-recorder "robot-event-filtered" 1 :Count
+                                   :dimensions {:site-id (str (:site-id attributes))})
+              (cloudwatch-recorder "robot-event-filtered" 1 :Count
+                                   :dimensions {:site-id (str (:site-id attributes))
+                                                :type (name event-name)}))
             (do
               (insert-event! database the-event)
-              (cloudwatch-recorder "event-inserted" 1 :Count :dimensions {:type (name event-name)})
-              (when (-> current-system :config :debug)
+              (cloudwatch-recorder "event-inserted" 1 :Count
+                                   :dimensions {:type (name event-name)})
+              (when (-> current-system :config :options :debug)
                 (log/info event-name))
               (condp = event-name
                 :thankyou (process-thankyou! database cloudwatch-recorder data)
-                :shopper-qualified-offers (process-shopper-qualified-offers! database cloudwatch-recorder data)
+                :productview (process-sources! database cloudwatch-recorder data)
+                :pageview (process-sources! database cloudwatch-recorder data)
+                :shopper-qualified-offers (process-shopper-qualified-offers!
+                                           database
+                                           cloudwatch-recorder
+                                           data)
                 nil)))
           (catch org.postgresql.util.PSQLException ex
             ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
-            (log/info "Failed to write event " the-event)
+            (log/info "Failed to write event " the-event ex)
             (cloudwatch-recorder "event-insert-failed" 1 :Count)
-            (cloudwatch-recorder "event-insert-failed" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
+            (cloudwatch-recorder "event-insert-failed" 1 :Count
+                                 :dimensions {:site-id (str (:site-id attributes))})
             (if (= (.getErrorCode ex) 23505)
-              (log/infof "Got a duplicate message with ID %s" (str (:event_id the-event)))))
+              (log/infof "Got a duplicate message with ID %s"
+                         (str (:event_id the-event)))))
           (catch Exception ex
             (cloudwatch-recorder "event-insert-failed" 1 :Count)
-            (cloudwatch-recorder "event-insert-failed" 1 :Count :dimensions {:site-id (str (:site-id attributes))})
+            (cloudwatch-recorder "event-insert-failed" 1 :Count
+                                 :dimensions {:site-id (str (:site-id attributes))})
             (log/errorf ex "EXCEPTION WHILE PROCESSING MESSAGE %s" (str data))))))))
 
 (defn deserialize
   [^java.nio.ByteBuffer byte-buffer]
-  (let [ba (byte-array (.remaining byte-buffer))]
+  (let [r #"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+        ba (byte-array (.remaining byte-buffer))]
     (.get byte-buffer ba)
     (let [in (ByteArrayInputStream. ba)
           in* (ByteArrayInputStream. ba)
@@ -146,18 +183,20 @@
       (if (.startsWith raw "[")
         (let [rdr (transit/reader in* :json)]
           (transit/read rdr))
-        (-> (json/read-str raw :key-fn keyword :value-fn (fn [k v]
-                                                           (if (and (coll? v)
-                                                                    (not (map? v)))
-                                                             (map (fn [cv]
-                                                                    (if (and (string? cv)
-                                                                             (re-matches #"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" cv))
-                                                                      (java.util.UUID/fromString cv)
-                                                                      cv)) v)
-                                                             (if (and (string? v)
-                                                                      (re-matches #"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" v))
-                                                               (java.util.UUID/fromString v)
-                                                               v))))
+        (-> (json/read-str raw
+                           :key-fn keyword
+                           :value-fn (fn [k v]
+                                       (if (and (coll? v)
+                                                (not (map? v)))
+                                         (map (fn [cv]
+                                                (if (and (string? cv)
+                                                         (re-matches r cv))
+                                                  (java.util.UUID/fromString cv)
+                                                  cv)) v)
+                                         (if (and (string? v)
+                                                  (re-matches r v))
+                                           (java.util.UUID/fromString v)
+                                           v))))
             :msg)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -178,13 +217,15 @@
                              :checkpoint 5
                              :processor (fn [messages]
                                           (log/debugf "Processing %d messages"
-                                                     (count messages))
+                                                      (count messages))
                                           (doseq [msg messages]
-                                            (process-message! database cloudwatch-recorder msg)))))
-          wid @(future (.run w))]
-      (log/info "Event Consumer Worker Started With ID %s" wid)
+                                            (process-message! database
+                                                              cloudwatch-recorder
+                                                              msg)))))
+          worker-thread (future (.run w))]
+      (log/info "Event Consumer Worker Started")
       (merge component {:worker w
-                        :worker-id wid})))
+                        :worker-thread worker-thread})))
   (stop [component]
     (log/info "Stopping Event Consumer")
     (if (:worker component)

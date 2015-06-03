@@ -15,14 +15,15 @@
   (UADetectorServiceFactory/getResourceModuleParser))
 
 (defn user-agent [s]
-  (try
-    (let [agent-data (to-clojure (.parse (parser) s))]
-      (reduce
-       (fn [m [k v]] (assoc m k v))
-       {}
-       agent-data))
-    (catch Throwable t
-      (log/warn "Unable to parse user agent string %s" s))))
+  (if s
+    (try
+      (let [agent-data (to-clojure (.parse (parser) s))]
+        (reduce
+         (fn [m [k v]] (assoc m k v))
+         {}
+         agent-data))
+      (catch Throwable t
+        (log/warnf "Unable to parse user agent string %s" s)))))
 
 (extend-protocol ToClojure
   DeviceCategory

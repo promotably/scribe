@@ -33,16 +33,22 @@
                                   (.setLayout (net.logstash.log4j.JSONEventLayoutV1.))
                                   (.setBlocking false)
                                   (.setBufferSize (int 500))
-                                  (.addAppender (doto (com.promotably.proggly.LogglyAppender.)
-                                                  (.setName "loggly")
-                                                  (.setLayout (net.logstash.log4j.JSONEventLayoutV1.))
-                                                  (.logglyURL loggly-url))))]
+                                  (.addAppender
+                                   (doto (com.promotably.proggly.LogglyAppender.)
+                                     (.setName "loggly")
+                                     (.setLayout
+                                      (net.logstash.log4j.JSONEventLayoutV1.))
+                                     (.logglyURL loggly-url))))]
             (doto root-logger
               (.addAppender loggly-appender))
-            (log/info "Loggly appender is attached?" (.isAttached root-logger loggly-appender))))
-      (log-config/set-loggers!
-       :root
-       (-> config :logging :base)))
+            (log/info "Loggly appender is attached?"
+                      (.isAttached root-logger loggly-appender))))
+      (do
+        (log-config/set-loggers!
+         :root
+         (-> config :logging :base)
+         "com.amazonaws"
+         (assoc (-> config :logging :base) :level :warn))))
     (log/logf :info "Environment is %s" (-> config :env))
     this)
   (stop [this]
@@ -183,7 +189,7 @@
 (defn system
   [{:keys [config-file port repl-port] :as options}]
   (comp/system-map
-   :config     (comp/using (config/map->Config options) [])
+   :config     (comp/using (config/map->Config {:options options}) [])
    :logging    (comp/using (map->LoggingComponent {}) [:config])
    :cider      (comp/using (map->ReplComponent {:port repl-port}) [:config :logging])
    :database   (comp/using (map->Database {}) [:config :logging])

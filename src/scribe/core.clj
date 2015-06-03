@@ -26,7 +26,7 @@
 
 (def cli-options
   [["-p" "--port PORT" "Listening port" :default 9999]
-   ["-r" "--repl-port PORT" "Repl / Cider listening port" :default 55555]
+   ["-r" "--repl-port PORT" "Repl / Cider listening port" :default 55556]
    ["-d" "--debug" "Debugging mode"]
    ["-c" "--config-file FILE" "Configuration file name"]
    ;; A non-idempotent option
