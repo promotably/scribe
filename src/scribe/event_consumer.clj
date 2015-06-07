@@ -160,14 +160,15 @@
                                            data)
                 nil)))
           (catch org.postgresql.util.PSQLException ex
-            ;; http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
-            (log/info "Failed to write event " the-event ex)
-            (cloudwatch-recorder "event-insert-failed" 1 :Count)
-            (cloudwatch-recorder "event-insert-failed" 1 :Count
-                                 :dimensions {:site-id (str (:site-id attributes))})
-            (if (= (.getErrorCode ex) 23505)
-              (log/infof "Got a duplicate message with ID %s"
-                         (str (:event_id the-event)))))
+            (if (seq (re-find #"duplicate key value violates unique constraint\"events_event_id_idx\""
+                              (.getMessage ex)))
+              (do (log/warnf "Got a duplicate message with ID %s" message-id)
+                  (cloudwatch-recorder "event-insert-duplicate" 1 :Count))
+              (do (log/errorf ex "Failed to write event %s" (with-out-str (clojure.pprint/pprint the-event)))
+                  (cloudwatch-recorder "event-insert-failed" 1 :Count)
+                  (cloudwatch-recorder "event-insert-failed" 1 :Count
+                                       :dimensions {:site-id (str (:site-id attributes))}))))
+
           (catch Exception ex
             (cloudwatch-recorder "event-insert-failed" 1 :Count)
             (cloudwatch-recorder "event-insert-failed" 1 :Count
