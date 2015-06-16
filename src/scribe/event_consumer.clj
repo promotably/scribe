@@ -119,7 +119,7 @@
   (log/trace message)
   (cloudwatch-recorder "event-received" 1 :Count)
   (try
-    (let [{:keys [message-id event-name attributes]} data
+    (let [{{:keys [message-id event-name attributes]} :msg} data
           user-agent-string (or
                              (get-in attributes [:user-agent])
                              (get-in attributes [:request-headers "user-agent"]))]
@@ -181,26 +181,21 @@
         ba (byte-array (.remaining byte-buffer))]
     (.get byte-buffer ba)
     (let [in (ByteArrayInputStream. ba)
-          in* (ByteArrayInputStream. ba)
           raw (slurp in)]
-      (if (.startsWith raw "[")
-        (let [rdr (transit/reader in* :json)]
-          (transit/read rdr))
-        (-> (json/read-str raw
-                           :key-fn keyword
-                           :value-fn (fn [k v]
-                                       (if (and (coll? v)
-                                                (not (map? v)))
-                                         (map (fn [cv]
-                                                (if (and (string? cv)
-                                                         (re-matches r cv))
-                                                  (java.util.UUID/fromString cv)
-                                                  cv)) v)
-                                         (if (and (string? v)
-                                                  (re-matches r v))
-                                           (java.util.UUID/fromString v)
-                                           v))))
-            :msg)))))
+      (json/read-str raw
+                     :key-fn keyword
+                     :value-fn (fn [k v]
+                                 (if (and (coll? v)
+                                          (not (map? v)))
+                                   (map (fn [cv]
+                                          (if (and (string? cv)
+                                                   (re-matches r cv))
+                                            (java.util.UUID/fromString cv)
+                                            cv)) v)
+                                   (if (and (string? v)
+                                            (re-matches r v))
+                                     (java.util.UUID/fromString v)
+                                     v)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -222,9 +217,14 @@
                                           (log/debugf "Processing %d messages"
                                                       (count messages))
                                           (doseq [msg messages]
-                                            (process-message! database
-                                                              cloudwatch-recorder
-                                                              msg)))))
+                                            (if (= :dev (-> current-system :config :env))
+                                              (when (= (-> msg :data :env) (str "dev-" (System/getProperty "user.name")))
+                                                (process-message! database
+                                                                  cloudwatch-recorder
+                                                                  msg))
+                                              (process-message! database
+                                                                cloudwatch-recorder
+                                                                msg))))))
           worker-thread (future (.run w))]
       (log/info "Event Consumer Worker Started")
       (merge component {:worker w
